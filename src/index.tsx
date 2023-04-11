@@ -26,10 +26,10 @@ import {
   tokenStore,
   getChainId,
   isWalletConnected,
-} from './store/index'
-import { ITokenObject, EventId } from './global/index'
-import { formatNumber } from './utils/index'
-import Assets from './assets'
+  assets
+} from './scom-token-list/index'
+import { ITokenObject, EventId } from './interface'
+import { formatNumber } from './utils'
 import { ImportToken } from './importToken'
 import { Contracts, Wallet } from '@ijstech/eth-wallet'
 import customStyle, { tokenStyle } from './index.css'
@@ -58,13 +58,16 @@ declare global {
 @customModule
 @customElements('i-scom-token-modal')
 export default class ScomTokenModal extends Module {
-  private _tokenDataListProp: Array<ITokenObject>
   private tokenBalancesMap: any
-  private fallbackUrl: string = Assets.fullPath('img/tokens/Custom.png')
   private hstackMap: Map<string, HStack> = new Map()
   private currentToken: string = ''
-
-  private isInited: boolean = false
+  private $eventBus: IEventBus
+  private _targetChainId: number
+  private _token: ITokenObject
+  private _title: string | Control = 'Select Token'
+  private _isCommonShown: boolean = false
+  private _isSortBalanceShown: boolean = true
+  private _importable: boolean = false
 
   private mdTokenSelection: Modal
   private gridTokenList: GridLayout
@@ -80,15 +83,6 @@ export default class ScomTokenModal extends Module {
   private inputSearch: Input
   @observable()
   private filterValue: string
-  private checkHasMetaMask: boolean
-  private $eventBus: IEventBus
-
-  private _targetChainId: number
-  private _token: ITokenObject
-  private _title: string | Control = 'Select Token'
-  private _isCommonShown: boolean = false
-  private _isSortBalanceShown: boolean = true
-  private _importable: boolean = false
 
   onSelectToken: (token: ITokenObject) => void
 
@@ -109,6 +103,7 @@ export default class ScomTokenModal extends Module {
   }
   set token(value: ITokenObject | undefined) {
     this._token = value
+    this.setActive(value)
     if (this.onSelectToken) this.onSelectToken(this.token)
   }
 
@@ -117,20 +112,11 @@ export default class ScomTokenModal extends Module {
   }
   set targetChainId(value: number) {
     this._targetChainId = value
-    this.updateDataByChain()
+    this.onUpdateData()
   }
 
   get chainId(): number {
     return this.targetChainId || getChainId()
-  }
-
-  get tokenDataListProp(): Array<ITokenObject> {
-    return this._tokenDataListProp
-  }
-
-  set tokenDataListProp(value: Array<ITokenObject>) {
-    this._tokenDataListProp = value
-    this.renderTokenList();
   }
 
   get isCommonShown(): boolean {
@@ -176,7 +162,7 @@ export default class ScomTokenModal extends Module {
     this.titleStack.appendChild(labelEl)
   }
 
-  private onRefresh() {
+  onRefresh() {
     if (isWalletConnected()) {
       this.tokenBalancesMap = tokenStore.tokenBalances || {};
       if (this.token) {
@@ -193,55 +179,26 @@ export default class ScomTokenModal extends Module {
     this.renderTokenList();
   }
 
-  private async updateDataByChain() {
-    this.tokenBalancesMap = await tokenStore.updateAllTokenBalances()
-    this.onRefresh()
-  }
-
   private async updateDataByNewToken() {
     this.tokenBalancesMap = tokenStore.tokenBalances || {}
     this.renderTokenList()
   }
 
-  private async onWalletConnect() {
-    this.checkHasMetaMask = hasMetaMask()
+  private async onUpdateData() {
     this.tokenBalancesMap = await tokenStore.updateAllTokenBalances()
     this.onRefresh()
   }
 
-  private async onWalletDisconnect() {
-    this.onRefresh()
-  }
-
-  private async onPaid() {
-    await this.updateDataByChain()
-    this.onRefresh()
-  }
-
   private registerEvent() {
-    this.$eventBus.register(
-      this,
-      EventId.IsWalletConnected,
-      this.onWalletConnect
-    )
-    this.$eventBus.register(
-      this,
-      EventId.IsWalletDisconnected,
-      this.onWalletDisconnect
-    )
-    this.$eventBus.register(this, EventId.chainChanged, this.updateDataByChain)
-    this.$eventBus.register(this, EventId.Paid, this.onPaid)
-    this.$eventBus.register(
-      this,
-      EventId.EmitNewToken,
-      this.updateDataByNewToken
-    )
+    this.$eventBus.register(this, EventId.IsWalletConnected, this.onUpdateData)
+    this.$eventBus.register(this, EventId.IsWalletDisconnected, this.onRefresh)
+    this.$eventBus.register(this, EventId.chainChanged, this.onUpdateData)
+    this.$eventBus.register(this, EventId.Paid, this.onUpdateData)
+    this.$eventBus.register(this, EventId.EmitNewToken, this.updateDataByNewToken)
   }
 
   private get tokenDataList(): ITokenObject[] {
-    let tokenList: ITokenObject[] = this.tokenDataListProp?.length
-      ? this.tokenDataListProp
-      : tokenStore.getTokenList(this.chainId)
+    let tokenList: ITokenObject[] = tokenStore.getTokenList(this.chainId)
     return tokenList
       .map((token: ITokenObject) => {
         const tokenObject = { ...token }
@@ -337,11 +294,11 @@ export default class ScomTokenModal extends Module {
     if (this.isCommonShown && this.commonTokenDataList) {
       this.pnlCommonToken.visible = true
       this.commonTokenDataList.forEach((token: ITokenObject) => {
-        const tokenIconPath = Assets.tokenPath(token, this.chainId)
+        const tokenIconPath = assets.tokenPath(token, this.chainId)
         this.gridCommonToken.appendChild(
           <i-hstack
             background={{ color: Theme.background.default }}
-            onClick={(target: Control) => this.onSelect(target, token)}
+            onClick={() => this.onSelect(token)}
             tooltip={{ content: token.name }}
             verticalAlignment='center'
             padding={{top: '0.35rem', bottom: '0.35rem', left: '0.5rem', right: '0.5rem'}}
@@ -352,7 +309,7 @@ export default class ScomTokenModal extends Module {
               width={24}
               height={24}
               url={tokenIconPath}
-              fallbackUrl={this.fallbackUrl}
+              fallbackUrl={assets.fallbackUrl}
             />
             <i-label caption={token.symbol}></i-label>
           </i-hstack>
@@ -364,7 +321,7 @@ export default class ScomTokenModal extends Module {
   }
 
   private renderToken(token: ITokenObject) {
-    const tokenIconPath = Assets.tokenPath(token, this.chainId)
+    const tokenIconPath = assets.tokenPath(token, this.chainId)
     const isActive = this.token && token.address === this.token.address;
     if (isActive)
       this.currentToken = this.token.address
@@ -383,7 +340,7 @@ export default class ScomTokenModal extends Module {
         }
         border={{ radius: 5 }}
         gap='0.5rem'
-        onClick={(target: Control) => this.onSelect(target, token)}
+        onClick={() => this.onSelect(token)}
       >
         <i-vstack width='100%'>
           <i-hstack gap='0.5rem' verticalAlignment='center'>
@@ -392,7 +349,7 @@ export default class ScomTokenModal extends Module {
                 width={24}
                 height={24}
                 url={tokenIconPath}
-                fallbackUrl={this.fallbackUrl}
+                fallbackUrl={assets.fallbackUrl}
               />
               <i-panel>
                 <i-label class="token-symbol" caption={token.symbol} font={{bold: true}} />
@@ -417,12 +374,12 @@ export default class ScomTokenModal extends Module {
                   ) : (
                     []
                   )}
-                  {token.address && this.checkHasMetaMask ? (
+                  {token.address && hasMetaMask() ? (
                     <i-image
                       display='flex'
                       width={16}
                       height={16}
-                      url={Assets.fullPath('img/metamask.png')}
+                      url={assets.fullPath('img/metamask.png')}
                       tooltip={{ content: 'Add to MetaMask' }}
                       onClick={(target: Control, event: Event) => this.addToMetamask(event, token)}                      
                     ></i-image>
@@ -528,7 +485,7 @@ export default class ScomTokenModal extends Module {
 
   private addToMetamask(event: Event, token: ITokenObject) {
     event.stopPropagation()
-    const tokenIconPath = Assets.tokenPath(token, this.chainId)
+    const tokenIconPath = assets.tokenPath(token, this.chainId)
     const img = `${window.location.origin}${tokenIconPath.substring(1)}`
     window.ethereum.request({
       method: 'wallet_watchAsset',
@@ -546,13 +503,13 @@ export default class ScomTokenModal extends Module {
 
   showModal() {
     if (!this.enabled) return
-    this.inputSearch.value = ''
+    if (this.inputSearch) this.inputSearch.value = ''
     this.filterValue = ''
     this.sortValue = undefined
     this.iconSortUp.classList.remove('icon-sorted')
     this.iconSortDown.classList.remove('icon-sorted')
-    if (!this.gridTokenList.innerHTML) this.onRefresh()
-    this.mdTokenSelection.visible = true
+    if (!this.gridTokenList?.innerHTML) this.onRefresh()
+    if (this.mdTokenSelection) this.mdTokenSelection.visible = true
     this.gridTokenList.scrollTop = 0
   }
 
@@ -560,8 +517,18 @@ export default class ScomTokenModal extends Module {
     this.mdTokenSelection.visible = false
   }
 
-  private async onSelect(target: Control, token: ITokenObject, isNew: boolean = false) {
-    this.token = token
+  private setActive(token: ITokenObject | undefined) {
+    if (this.currentToken && this.hstackMap.has(this.currentToken)) {
+      this.hstackMap.get(this.currentToken).classList.remove('is-selected')
+    }
+    if (token && this.hstackMap.has(token.address)) {
+      this.hstackMap.get(token.address).classList.add('is-selected')
+    }
+    this.currentToken = token?.address || ''
+  }
+
+  private async onSelect(token: ITokenObject, isNew: boolean = false) {
+    this._token = token
     // The token has been not imported
     if (
       !isNew &&
@@ -574,17 +541,7 @@ export default class ScomTokenModal extends Module {
       this.$eventBus.dispatch(EventId.EmitNewToken, token)
       isNew = true
     }
-    // const tokens = this.querySelectorAll('.token-item')
-    // tokens.forEach(token => token.classList.remove('is-selected'))
-    // target.classList.add('is-selected')
-
-    if (this.currentToken && this.hstackMap.has(this.currentToken)) {
-      this.hstackMap.get(this.currentToken).classList.remove('is-selected')
-    }
-    if (this.hstackMap.has(token.address)) {
-      this.hstackMap.get(token.address).classList.add('is-selected')
-    }
-    this.currentToken = token.address
+    this.setActive(token)
     if (this.onSelectToken)
       this.onSelectToken({ ...token, isNew })
     this.mdTokenSelection.visible = false
@@ -592,18 +549,18 @@ export default class ScomTokenModal extends Module {
 
   async init() {
     this.classList.add(customStyle)
-    await this.onWalletConnect()
     super.init()
     this.onSelectToken = this.getAttribute('onSelectToken', true) || this.onSelectToken
     const titleAttr = this.getAttribute('title', true)
     if (titleAttr) this.title = titleAttr
     const token = this.getAttribute('token', true)
     if (token) this.token = token
-    this.targetChainId = this.getAttribute('chainId', true)
+    const chainId = this.getAttribute('chainId', true)
+    if (chainId) this.targetChainId = chainId
     this.isCommonShown = this.getAttribute('isCommonShown', true, false)
     this.isSortBalanceShown = this.getAttribute('isSortBalanceShown', true, true)
     this.importable = this.getAttribute('importable', true, false)
-    this.isInited = true
+    await this.onUpdateData()
   }
 
   showImportTokenModal(target: Control, event: Event, token: ITokenObject) {
@@ -614,7 +571,7 @@ export default class ScomTokenModal extends Module {
   }
 
   onImportToken(target: Control, token: ITokenObject) {
-    this.onSelect(target, token, true)
+    this.onSelect(token, true)
   }
 
   onCloseModal() {
@@ -725,7 +682,6 @@ export default class ScomTokenModal extends Module {
               width='100%'
               columnsPerRow={1}
               templateRows={['max-content']}
-              class="is-button"
               gap={{ row: '0.5rem' }}
             ></i-grid-layout>
           </i-panel>

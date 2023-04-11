@@ -15,8 +15,15 @@ export default class Module1 extends Module {
         super.init();
         this.mbToken2 = await ScomTokenModal.create({
             importable: true,
-            chainId: 43113
+            chainId: 43113,
+            onSelectToken: this.onSelectToken.bind(this)
         })
+        this.mbToken2.title = (
+            <i-hstack verticalAlignment="center" gap="4px">
+                <i-label caption='Select a token'></i-label>
+                <i-icon name="question-circle" width={16} height={16}></i-icon>
+            </i-hstack>
+        )
         this.mainStack.appendChild(this.mbToken2);
         this.btnSelect.onClick = () => this.mbToken2.showModal()
     }
@@ -26,7 +33,7 @@ export default class Module1 extends Module {
     }
 
     private onSelectToken(token: any) {
-        console.log(token)
+        console.log('onSelectToken: ', token)
     }
 
     render() {
