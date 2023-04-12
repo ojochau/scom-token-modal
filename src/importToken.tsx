@@ -12,8 +12,12 @@ import {
   Checkbox
 } from '@ijstech/components'; 
 import { Wallet } from '@ijstech/eth-wallet';
-import { EventId, ITokenObject } from './global/index';
-import { addUserTokens, tokenStore, viewOnExplorerByAddress } from './store/index';
+import { EventId, ITokenObject } from './interface';
+import { viewOnExplorerByAddress } from './utils';
+import {
+  tokenStore,
+  addUserTokens
+} from './scom-token-list/index'
 
 declare global {
 	namespace JSX {
