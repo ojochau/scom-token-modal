@@ -2,6 +2,3 @@ node_modules
 package-lock.json
 test/ref
 test/dist
-dist
-src/img
-src/scom-token-list
