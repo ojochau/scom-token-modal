@@ -27,7 +27,7 @@ import {
   getChainId,
   isWalletConnected,
   assets
-} from './scom-token-list/index'
+} from '@scom/scom-token-list'
 import { ITokenObject, EventId } from './interface'
 import { formatNumber } from './utils'
 import { ImportToken } from './importToken'

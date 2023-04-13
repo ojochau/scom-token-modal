@@ -17,7 +17,7 @@ import { viewOnExplorerByAddress } from './utils';
 import {
   tokenStore,
   addUserTokens
-} from './scom-token-list/index'
+} from '@scom/scom-token-list'
 
 declare global {
 	namespace JSX {
