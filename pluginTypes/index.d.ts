@@ -32,6 +32,7 @@ declare module "@scom/scom-token-modal/interface.ts" {
         isNative?: boolean | null;
         isWETH?: boolean | null;
         isNew?: boolean | null;
+        chainId?: number;
     }
     export type TokenMapType = {
         [token: string]: ITokenObject;
@@ -95,6 +96,7 @@ declare module "@scom/scom-token-modal" {
         title?: string;
         chainId?: number;
         token?: ITokenObject;
+        tokenDataListProp?: ITokenObject[];
         importable?: boolean;
         isSortBalanceShown?: boolean;
         isCommonShown?: boolean;
@@ -118,6 +120,7 @@ declare module "@scom/scom-token-modal" {
         private _isCommonShown;
         private _isSortBalanceShown;
         private _importable;
+        private _tokenDataListProp;
         private mdTokenSelection;
         private gridTokenList;
         private gridCommonToken;
@@ -150,6 +153,9 @@ declare module "@scom/scom-token-modal" {
         private updateDataByNewToken;
         private onUpdateData;
         private registerEvent;
+        get tokenDataListProp(): Array<ITokenObject>;
+        set tokenDataListProp(value: Array<ITokenObject>);
+        private get tokenListByChainId();
         private get tokenDataList();
         private get commonTokenDataList();
         private get tokenDataListFiltered();
