@@ -17,7 +17,7 @@ import {
   Label,
   customModule
 } from '@ijstech/components'
-import {} from '@ijstech/eth-contract'
+import { } from '@ijstech/eth-contract'
 import {
   ChainNativeTokenByChainId,
   hasMetaMask,
@@ -26,7 +26,8 @@ import {
   tokenStore,
   getChainId,
   isWalletConnected,
-  assets
+  assets,
+  DefaultERC20Tokens
 } from '@scom/scom-token-list'
 import { ITokenObject, EventId } from './interface'
 import { formatNumber } from './utils'
@@ -39,6 +40,7 @@ interface ScomTokenModalElement extends ControlElement {
   title?: string;
   chainId?: number;
   token?: ITokenObject;
+  tokenDataListProp?: ITokenObject[];
   importable?: boolean;
   isSortBalanceShown?: boolean;
   isCommonShown?: boolean;
@@ -68,6 +70,7 @@ export default class ScomTokenModal extends Module {
   private _isCommonShown: boolean = false
   private _isSortBalanceShown: boolean = true
   private _importable: boolean = false
+  private _tokenDataListProp: ITokenObject[] = []
 
   private mdTokenSelection: Modal
   private gridTokenList: GridLayout
@@ -197,8 +200,34 @@ export default class ScomTokenModal extends Module {
     this.$eventBus.register(this, EventId.EmitNewToken, this.updateDataByNewToken)
   }
 
+  get tokenDataListProp(): Array<ITokenObject> {
+    return this._tokenDataListProp;
+  }
+
+  set tokenDataListProp(value: Array<ITokenObject>) {
+    this._tokenDataListProp = value;
+    this.renderTokenList();
+  }
+
+  private get tokenListByChainId() {
+    let list: ITokenObject[] = [];
+    const propList = this.tokenDataListProp.filter(f => !f.chainId || f.chainId === this.chainId);
+    const nativeToken = ChainNativeTokenByChainId[this.chainId];
+    const tokens = DefaultERC20Tokens[this.chainId];
+    for (const token of propList) {
+      const tokenAddress = token.address?.toLowerCase();
+      if (!tokenAddress || tokenAddress === nativeToken?.symbol?.toLowerCase()) {
+        if (nativeToken) list.push({ ...nativeToken, chainId: this.chainId });
+      } else {
+        const tokenObj = tokens.find(v => v.address?.toLowerCase() === tokenAddress);
+        if (tokenObj) list.push({ ...token, chainId: this.chainId });
+      }
+    }
+    return list;
+  }
+
   private get tokenDataList(): ITokenObject[] {
-    let tokenList: ITokenObject[] = tokenStore.getTokenList(this.chainId)
+    let tokenList: ITokenObject[] = this.tokenListByChainId.length ? this.tokenListByChainId : tokenStore.getTokenList(this.chainId);
     return tokenList
       .map((token: ITokenObject) => {
         const tokenObject = { ...token }
@@ -212,13 +241,12 @@ export default class ScomTokenModal extends Module {
           Object.assign(tokenObject, {
             balance:
               this.tokenBalancesMap[
-                token.address?.toLowerCase() || token.symbol
+              token.address?.toLowerCase() || token.symbol
               ] || 0,
           })
         }
         return tokenObject
-      })
-      .sort(this.sortToken)
+      }).sort(this.sortToken)
   }
 
   private get commonTokenDataList(): ITokenObject[] {
@@ -301,8 +329,8 @@ export default class ScomTokenModal extends Module {
             onClick={() => this.onSelect(token)}
             tooltip={{ content: token.name }}
             verticalAlignment='center'
-            padding={{top: '0.35rem', bottom: '0.35rem', left: '0.5rem', right: '0.5rem'}}
-            border={{radius: '1rem', width: '1px', style: 'solid', color: 'transparent'}}
+            padding={{ top: '0.35rem', bottom: '0.35rem', left: '0.5rem', right: '0.5rem' }}
+            border={{ radius: '1rem', width: '1px', style: 'solid', color: 'transparent' }}
             gap="0.5rem" class='common-token pointer'
           >
             <i-image
@@ -352,7 +380,7 @@ export default class ScomTokenModal extends Module {
                 fallbackUrl={assets.fallbackUrl}
               />
               <i-panel>
-                <i-label class="token-symbol" caption={token.symbol} font={{bold: true}} />
+                <i-label class="token-symbol" caption={token.symbol} font={{ bold: true }} />
                 <i-hstack
                   verticalAlignment='center'
                   gap='0.5rem'
@@ -381,7 +409,7 @@ export default class ScomTokenModal extends Module {
                       height={16}
                       url={assets.fullPath('img/metamask.png')}
                       tooltip={{ content: 'Add to MetaMask' }}
-                      onClick={(target: Control, event: Event) => this.addToMetamask(event, token)}                      
+                      onClick={(target: Control, event: Event) => this.addToMetamask(event, token)}
                     ></i-image>
                   ) : (
                     []
@@ -553,6 +581,7 @@ export default class ScomTokenModal extends Module {
     this.onSelectToken = this.getAttribute('onSelectToken', true) || this.onSelectToken
     const titleAttr = this.getAttribute('title', true)
     if (titleAttr) this.title = titleAttr
+    this.tokenDataListProp = this.getAttribute('tokenDataListProp', true, [])
     const token = this.getAttribute('token', true)
     if (token) this.token = token
     const chainId = this.getAttribute('chainId', true)
@@ -647,7 +676,7 @@ export default class ScomTokenModal extends Module {
                 onKeyUp={this.onSearch.bind(this)}
               ></i-input>
             </i-panel>
-            <i-panel id='pnlCommonToken' margin={{top: '0.5rem', bottom: '0.5rem'}}>
+            <i-panel id='pnlCommonToken' margin={{ top: '0.5rem', bottom: '0.5rem' }}>
               <i-label caption='Common Token' />
               <i-grid-layout
                 id='gridCommonToken'
