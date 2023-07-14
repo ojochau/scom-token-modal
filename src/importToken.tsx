@@ -12,12 +12,10 @@ import {
   Checkbox
 } from '@ijstech/components'; 
 import { Wallet } from '@ijstech/eth-wallet';
-import { EventId, ITokenObject } from './interface';
-import { viewOnExplorerByAddress } from './utils';
-import {
-  tokenStore,
-  addUserTokens
-} from '@scom/scom-token-list'
+import { ITokenObject } from '@scom/scom-token-list';
+import { getChainId, getRpcWallet, viewOnExplorerByAddress } from './utils';
+import { tokenStore, addUserTokens } from '@scom/scom-token-list';
+import { EventId } from './interface';
 
 declare global {
 	namespace JSX {
@@ -72,9 +70,11 @@ export class ImportToken extends Module {
   async onImportToken(source: Control, event: Event) {
     event.stopPropagation();
     const tokenObj = this.token;
-    addUserTokens(tokenObj);
-    tokenStore.updateTokenMapData();
-    await tokenStore.updateAllTokenBalances();
+    const chainId = getChainId();
+    addUserTokens(chainId, tokenObj);
+    const rpcWallet = getRpcWallet();
+    tokenStore.updateTokenMapData(chainId);
+    await tokenStore.updateAllTokenBalances(rpcWallet);
     this.$eventBus.dispatch(EventId.EmitNewToken, tokenObj);
     if (typeof this.onUpdate === 'function') {
       this.onUpdate(tokenObj);
@@ -94,7 +94,6 @@ export class ImportToken extends Module {
   async init() {
     super.init();
     this.importModal.onClose = () => {
-      // Set the checkbox to default State when modal closed 
       this.tokenAgreeCheckBox.checked = false;
       this.importBtn.enabled = false;
     }
@@ -113,35 +112,48 @@ export class ImportToken extends Module {
               font={{ color: '#1890ff' }}
               class="pointer"
               onClick={() => this.viewContract()}
-            ></i-label>
+            />
           </i-hstack>
           <i-panel class="btn-source-panel">
-            <i-icon name="exclamation-triangle" margin={{ right: 3 }} fill='#fff' width={15} height={15}></i-icon>
+            <i-icon name="exclamation-triangle" margin={{ right: 3 }} fill="#fff" width={15} height={15} />
             <i-label caption="Unknow Source"/>
           </i-panel>
         </i-panel>
         <i-panel class="pnl-token-import">
-          <i-hstack  horizontalAlignment='center' margin={{ bottom: 5 }}> 
-            <i-icon name="exclamation-triangle" margin={{ right: 3 }} fill='#e83e8c' width={30} height={30}></i-icon>
+          <i-hstack  horizontalAlignment="center" margin={{ bottom: 5 }}> 
+            <i-icon name="exclamation-triangle" margin={{ right: 3 }} fill="#e83e8c" width={30} height={30} />
           </i-hstack>
-          <i-hstack  horizontalAlignment='center' class="text-center" margin={{ bottom: 5 }}> 
-            <i-label font={{bold:true, color:"#fff"}} caption="Trade at your own risk!"/> 
+          <i-hstack  horizontalAlignment="center" class="text-center" margin={{ bottom: 5 }}> 
+            <i-label font={{bold:true}} caption="Trade at your own risk!"/> 
           </i-hstack>
-          <i-hstack  horizontalAlignment='center' class="text-center" margin={{ bottom: 5 }}> 
-            <i-label font={{color:"#fff"}} caption="Anyone can create a token, including creating fake versions of existing token that claims tp represent projects"/> 
+          <i-hstack  horizontalAlignment="center" class="text-center" margin={{ bottom: 5 }}> 
+            <i-label caption="Anyone can create a token, including creating fake versions of existing token that claims tp represent projects"/> 
           </i-hstack>
-          <i-hstack  horizontalAlignment='center' class="text-center" margin={{ bottom: 5 }}> 
-            <i-label width={300} font={{bold:true, color:"#fff"}} caption="If you purchased this token, you may not be to able sell it back"/> 
+          <i-hstack  horizontalAlignment="center" class="text-center" margin={{ bottom: 5 }}> 
+            <i-label width={300} font={{bold:true}} caption="If you purchased this token, you may not be to able sell it back"/> 
           </i-hstack>
-          <i-hstack  horizontalAlignment='center' class="text-center">
-            <i-checkbox id="tokenAgreeCheckBox" width="200" margin={{ top: 30 }} height={30} class="token-agree-input"
-              background={{ color: "transparent" }} caption='I understand' onChanged={this.onHandleCheck.bind(this)}
-            ></i-checkbox>
+          <i-hstack  horizontalAlignment="center" class="text-center">
+            <i-checkbox
+              id="tokenAgreeCheckBox"
+              width="200"
+              margin={{ top: 30 }}
+              height={30}
+              class="token-agree-input"
+              background={{ color: 'transparent' }}
+              caption="I understand"
+              onChanged={this.onHandleCheck.bind(this)}
+            />
           </i-hstack>
         </i-panel>
-        <i-button id="importBtn" class="btn-import" width="100%" caption='Import'
-          height={40} enabled={false} onClick={this.onImportToken.bind(this)}
-        ></i-button>
+        <i-button
+          id="importBtn"
+          class="btn-import"
+          width="100%"
+          caption="Import"
+          height={40}
+          enabled={false}
+          onClick={this.onImportToken.bind(this)}
+        />
       </i-modal>
 		)
 	}
