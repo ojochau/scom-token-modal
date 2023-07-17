@@ -1,3 +1,5 @@
+import { ITokenObject } from "@scom/scom-token-list";
+
 export interface INetwork {
   chainId: number;
   name: string;
@@ -18,21 +20,6 @@ export const enum EventId {
   IsWalletDisconnected = "IsWalletDisconnected",
   EmitNewToken = "EmitNewToken",
   Paid = "Paid"
-};
-
-export interface ITokenObject {
-  address?: string;
-  name: string;
-  decimals: number;
-  symbol: string;
-  status?: boolean | null;
-  logoURI?: string;
-  isCommon?: boolean | null;
-  balance?: string | number;
-  isNative?: boolean | null;
-  isWETH?: boolean | null;
-  isNew?: boolean | null;
-  chainId?: number;
 };
 
 export type TokenMapType = { [token: string]: ITokenObject };

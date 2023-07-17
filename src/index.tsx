@@ -24,15 +24,15 @@ import {
   hasUserToken,
   setUserTokens,
   tokenStore,
-  getChainId,
   isWalletConnected,
   assets,
-  DefaultERC20Tokens
+  DefaultERC20Tokens,
+  ITokenObject
 } from '@scom/scom-token-list'
-import { ITokenObject, EventId } from './interface'
-import { formatNumber } from './utils'
+import { EventId } from './interface'
+import { formatNumber, getChainId, getRpcWallet, setRpcWalletId } from './utils'
 import { ImportToken } from './importToken'
-import { Contracts, Wallet } from '@ijstech/eth-wallet'
+import { Constants, Contracts, IEventBusRegistry, Wallet } from '@ijstech/eth-wallet'
 import customStyle, { tokenStyle } from './index.css'
 const Theme = Styles.Theme.ThemeVars
 
@@ -44,6 +44,7 @@ interface ScomTokenModalElement extends ControlElement {
   importable?: boolean;
   isSortBalanceShown?: boolean;
   isCommonShown?: boolean;
+  rpcWalletId?: string;
   onSelectToken?: (token: ITokenObject) => void
 }
 
@@ -71,6 +72,10 @@ export default class ScomTokenModal extends Module {
   private _isSortBalanceShown: boolean = true
   private _importable: boolean = false
   private _tokenDataListProp: ITokenObject[] = []
+  private _rpcWalletId: string = ''
+
+  private walletEvents: IEventBusRegistry[] = [];
+  private clientEvents: any[] = [];
 
   private mdTokenSelection: Modal
   private gridTokenList: GridLayout
@@ -99,6 +104,14 @@ export default class ScomTokenModal extends Module {
     let self = new this(parent, options);
     await self.ready();
     return self;
+  }
+
+  get rpcWalletId() {
+    return this._rpcWalletId
+  }
+  set rpcWalletId(value: string) {
+    this._rpcWalletId = value
+    setRpcWalletId(value)
   }
 
   get token() {
@@ -187,17 +200,36 @@ export default class ScomTokenModal extends Module {
     this.renderTokenList()
   }
 
-  private async onUpdateData() {
-    this.tokenBalancesMap = await tokenStore.updateAllTokenBalances()
+  private async onUpdateData(onPaid?: boolean) {
+    const rpcWallet = getRpcWallet()
+    if (rpcWallet)
+      this.tokenBalancesMap = onPaid ? tokenStore.tokenBalances : await tokenStore.updateAllTokenBalances(rpcWallet);
+    else this.tokenBalancesMap = {};
     this.onRefresh()
   }
 
   private registerEvent() {
-    this.$eventBus.register(this, EventId.IsWalletConnected, this.onUpdateData)
-    this.$eventBus.register(this, EventId.IsWalletDisconnected, this.onRefresh)
-    this.$eventBus.register(this, EventId.chainChanged, this.onUpdateData)
-    this.$eventBus.register(this, EventId.Paid, this.onUpdateData)
-    this.$eventBus.register(this, EventId.EmitNewToken, this.updateDataByNewToken)
+    const clientWallet = Wallet.getClientInstance();
+    this.walletEvents.push(clientWallet.registerWalletEvent(this, Constants.ClientWalletEvent.AccountsChanged, async (payload: Record<string, any>) => {
+      this.onUpdateData()
+    }));
+    this.clientEvents.push(this.$eventBus.register(this, EventId.chainChanged, async (chainId: number) => {
+      this.onUpdateData();
+    }));
+    this.clientEvents.push(this.$eventBus.register(this, EventId.Paid, () => this.onUpdateData(true)))
+    this.clientEvents.push(this.$eventBus.register(this, EventId.EmitNewToken, this.updateDataByNewToken))
+  }
+
+  onHide() {
+    const rpcWallet = getRpcWallet();
+    for (let event of this.walletEvents) {
+      rpcWallet.unregisterWalletEvent(event);
+    }
+    this.walletEvents = [];
+    for (let event of this.clientEvents) {
+      event.unregister();
+    }
+    this.clientEvents = [];
   }
 
   get tokenDataListProp(): Array<ITokenObject> {
@@ -228,73 +260,72 @@ export default class ScomTokenModal extends Module {
 
   private get tokenDataList(): ITokenObject[] {
     let tokenList: ITokenObject[] = this.tokenListByChainId.length ? this.tokenListByChainId : tokenStore.getTokenList(this.chainId);
-    return tokenList
-      .map((token: ITokenObject) => {
-        const tokenObject = { ...token }
-        const nativeToken = ChainNativeTokenByChainId[this.chainId]
-        if (token.symbol === nativeToken.symbol) {
-          Object.assign(tokenObject, { isNative: true })
-        }
-        if (!isWalletConnected()) {
-          Object.assign(tokenObject, { balance: 0 })
-        } else if (this.tokenBalancesMap && this.chainId === getChainId()) {
-          Object.assign(tokenObject, {
-            balance:
-              this.tokenBalancesMap[
-              token.address?.toLowerCase() || token.symbol
-              ] || 0,
-          })
-        }
-        return tokenObject
-      }).sort(this.sortToken)
+    if (this.tokenDataListProp && this.tokenDataListProp.length) {
+      tokenList = this.tokenDataListProp;
+    }
+    if (!this.tokenBalancesMap || !Object.keys(this.tokenBalancesMap).length) {
+      this.tokenBalancesMap = tokenStore.tokenBalances || {};
+    }
+    return tokenList.map((token: ITokenObject) => {
+      const tokenObject = { ...token };
+      const nativeToken = ChainNativeTokenByChainId[this.chainId];
+      if (nativeToken?.symbol && token.symbol === nativeToken.symbol) {
+        Object.assign(tokenObject, { isNative: true })
+      }
+      if (!isWalletConnected()){
+        Object.assign(tokenObject, {
+          balance: 0,
+        })
+      }
+      else if (this.tokenBalancesMap) {
+        Object.assign(tokenObject, {
+          balance: this.tokenBalancesMap[token.address?.toLowerCase() || token.symbol] || 0,
+        })
+      }
+      return tokenObject;
+    }).sort(this.sortToken);
   }
 
   private get commonTokenDataList(): ITokenObject[] {
-    const tokenList: ITokenObject[] = this.tokenDataList
-    if (!tokenList) return []
-    return tokenList.filter(
-      (token: ITokenObject) => token.isCommon || token.isNative
-    )
+    const tokenList: ITokenObject[] = this.tokenDataList;
+    if (!tokenList) return [];
+    return tokenList.filter((token: ITokenObject) => token.isCommon || token.isNative);
   }
 
   private get tokenDataListFiltered(): ITokenObject[] {
-    let tokenList: ITokenObject[] = this.tokenDataList || []
+    let tokenList: ITokenObject[] = this.tokenDataList || [];
     if (tokenList.length) {
       if (this.filterValue) {
         tokenList = tokenList.filter((token: ITokenObject) => {
-          return (
-            token.symbol.toUpperCase().includes(this.filterValue) ||
+          return token.symbol.toUpperCase().includes(this.filterValue) ||
             token.name.toUpperCase().includes(this.filterValue) ||
-            token.address?.toUpperCase() === this.filterValue
-          )
-        })
+            token.address?.toUpperCase() === this.filterValue;
+        });
       }
       if (this.sortValue !== undefined) {
         tokenList = tokenList.sort((a: ITokenObject, b: ITokenObject) => {
-          return this.sortToken(a, b, this.sortValue)
-        })
-        const allBalanceZero = !tokenList.some(
-          (token: ITokenObject) => token.balance && token.balance !== '0'
-        )
+          return this.sortToken(a, b, this.sortValue);
+        });
+        const allBalanceZero = !tokenList.some((token: ITokenObject) => token.balance && token.balance !== '0');
         if (allBalanceZero && !this.sortValue) {
-          tokenList = tokenList.reverse()
+          tokenList = tokenList.reverse();
         }
       }
     }
-    return tokenList
+    return tokenList;
   }
 
   private sortToken = (a: any, b: any, asc?: boolean) => {
     if (a.balance != b.balance) {
-      return asc ? a.balance - b.balance : b.balance - a.balance
+      return asc ? (a.balance - b.balance) : (b.balance - a.balance);
     }
-    if (a.symbol.toLowerCase() < b.symbol.toLowerCase()) {
-      return -1
+    if (a.symbol?.toLowerCase() < b.symbol?.toLowerCase()) {
+      return -1;
     }
-    if (a.symbol.toLowerCase() > b.symbol.toLowerCase()) {
-      return 1
+    if (a.symbol?.toLowerCase() > b.symbol?.toLowerCase()) {
+      return 1;
     }
-    return 0
+    return 0;
   }
 
   private sortBalance() {
@@ -492,18 +523,13 @@ export default class ScomTokenModal extends Module {
         this.renderToken(token)
       )
       this.gridTokenList.append(...tokenItems)
-    } else if (
-      !this.importable ||
-      (this.targetChainId && this.targetChainId !== getChainId())
-    ) {
-      this.clearTokenList()
     } else {
       try {
         const tokenObj = await this.getTokenObject(this.filterValue, true)
         if (!tokenObj) throw new Error('Token is invalid')
         this.gridTokenList.clearInnerHTML()
         this.gridTokenList.appendChild(
-          this.renderToken({ ...tokenObj, isNew: true })
+          this.renderToken({ ...tokenObj, chainId: this.chainId,isNew: true })
         )
       } catch (err) {
         this.clearTokenList()
@@ -563,10 +589,11 @@ export default class ScomTokenModal extends Module {
       token.isNew &&
       !hasUserToken(token.address || '', this.chainId)
     ) {
+      const rpcWallet = getRpcWallet();
       setUserTokens(token, this.chainId)
-      tokenStore.updateTokenMapData()
-      await tokenStore.updateAllTokenBalances()
-      this.$eventBus.dispatch(EventId.EmitNewToken, token)
+      tokenStore.updateTokenMapData(this.chainId);
+      await tokenStore.updateAllTokenBalances(rpcWallet);
+      this.$eventBus.dispatch(EventId.EmitNewToken, token);
       isNew = true
     }
     this.setActive(token)
@@ -578,6 +605,8 @@ export default class ScomTokenModal extends Module {
   async init() {
     this.classList.add(customStyle)
     super.init()
+    const rpcWalletId = this.getAttribute('rpcWalletId', true)
+    if (rpcWalletId) this.rpcWalletId = rpcWalletId
     this.onSelectToken = this.getAttribute('onSelectToken', true) || this.onSelectToken
     const titleAttr = this.getAttribute('title', true)
     if (titleAttr) this.title = titleAttr

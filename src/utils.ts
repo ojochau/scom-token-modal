@@ -46,3 +46,20 @@ export const viewOnExplorerByAddress = (chainId: number, address: string) => {
     window.open(url);
   }
 }
+
+const state = {
+  rpcWalletId: "",
+}
+
+export const setRpcWalletId = (value: string) => {
+  state.rpcWalletId = value;
+}
+
+export const getRpcWallet = () => {
+  return Wallet.getRpcWalletInstance(state.rpcWalletId);
+}
+
+export function getChainId() {
+  const rpcWallet = getRpcWallet();
+  return rpcWallet?.chainId;
+};
