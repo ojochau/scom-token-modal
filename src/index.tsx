@@ -120,7 +120,7 @@ export default class ScomTokenModal extends Module {
   set token(value: ITokenObject | undefined) {
     this._token = value
     this.setActive(value)
-    if (this.onSelectToken) this.onSelectToken(this.token)
+    // if (this.onSelectToken) this.onSelectToken(this.token)
   }
 
   get targetChainId(): number {

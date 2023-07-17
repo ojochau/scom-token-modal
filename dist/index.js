@@ -340,8 +340,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
         set token(value) {
             this._token = value;
             this.setActive(value);
-            if (this.onSelectToken)
-                this.onSelectToken(this.token);
+            // if (this.onSelectToken) this.onSelectToken(this.token)
         }
         get targetChainId() {
             return this._targetChainId;
