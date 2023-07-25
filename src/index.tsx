@@ -128,7 +128,7 @@ export default class ScomTokenModal extends Module {
   }
   set targetChainId(value: number) {
     this._targetChainId = value
-    this.onUpdateData()
+    // this.onUpdateData()
   }
 
   get chainId(): number {
@@ -140,7 +140,7 @@ export default class ScomTokenModal extends Module {
   }
   set isCommonShown(value: boolean) {
     this._isCommonShown = value
-    this.renderCommonItems()
+    // this.renderCommonItems()
   }
 
   get isSortBalanceShown(): boolean {
@@ -238,7 +238,7 @@ export default class ScomTokenModal extends Module {
 
   set tokenDataListProp(value: Array<ITokenObject>) {
     this._tokenDataListProp = value;
-    this.renderTokenList();
+    // this.renderTokenList();
   }
 
   private get tokenListByChainId() {
@@ -347,7 +347,7 @@ export default class ScomTokenModal extends Module {
     this.renderTokenList()
   }
 
-  private async renderCommonItems() {
+  private renderCommonItems() {
     if (!this.gridCommonToken) return
     this.gridCommonToken.innerHTML = ''
     if (this.isCommonShown && this.commonTokenDataList) {
@@ -618,7 +618,7 @@ export default class ScomTokenModal extends Module {
     this.isCommonShown = this.getAttribute('isCommonShown', true, false)
     this.isSortBalanceShown = this.getAttribute('isSortBalanceShown', true, true)
     this.importable = this.getAttribute('importable', true, false)
-    await this.onUpdateData()
+    // await this.onUpdateData()
   }
 
   showImportTokenModal(target: Control, event: Event, token: ITokenObject) {
@@ -634,11 +634,11 @@ export default class ScomTokenModal extends Module {
 
   onCloseModal() {
     this.filterValue = ''
-    this.renderTokenList()
   }
 
   onOpenModal() {
     if (this._title) this.title = this._title
+    this.renderTokenList();
   }
 
   render() {

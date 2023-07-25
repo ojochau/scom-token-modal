@@ -347,7 +347,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
         }
         set targetChainId(value) {
             this._targetChainId = value;
-            this.onUpdateData();
+            // this.onUpdateData()
         }
         get chainId() {
             return this.targetChainId || (0, utils_2.getChainId)();
@@ -357,7 +357,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
         }
         set isCommonShown(value) {
             this._isCommonShown = value;
-            this.renderCommonItems();
+            // this.renderCommonItems()
         }
         get isSortBalanceShown() {
             return this._isSortBalanceShown;
@@ -450,7 +450,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
         }
         set tokenDataListProp(value) {
             this._tokenDataListProp = value;
-            this.renderTokenList();
+            // this.renderTokenList();
         }
         get tokenListByChainId() {
             var _a, _b;
@@ -548,7 +548,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             this.filterValue = source.value.toUpperCase();
             this.renderTokenList();
         }
-        async renderCommonItems() {
+        renderCommonItems() {
             if (!this.gridCommonToken)
                 return;
             this.gridCommonToken.innerHTML = '';
@@ -705,7 +705,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             this.isCommonShown = this.getAttribute('isCommonShown', true, false);
             this.isSortBalanceShown = this.getAttribute('isSortBalanceShown', true, true);
             this.importable = this.getAttribute('importable', true, false);
-            await this.onUpdateData();
+            // await this.onUpdateData()
         }
         showImportTokenModal(target, event, token) {
             event.stopPropagation();
@@ -718,11 +718,11 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
         }
         onCloseModal() {
             this.filterValue = '';
-            this.renderTokenList();
         }
         onOpenModal() {
             if (this._title)
                 this.title = this._title;
+            this.renderTokenList();
         }
         render() {
             return (this.$render("i-panel", null,
