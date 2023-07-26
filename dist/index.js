@@ -270,7 +270,7 @@ define("@scom/scom-token-modal/index.css.ts", ["require", "exports", "@ijstech/c
         }
     });
 });
-define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "@scom/scom-token-list", "@scom/scom-token-modal/utils.ts", "@ijstech/eth-wallet", "@scom/scom-token-modal/index.css.ts"], function (require, exports, components_3, scom_token_list_2, utils_2, eth_wallet_3, index_css_1) {
+define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "@scom/scom-token-list", "@scom/scom-token-modal/utils.ts", "@scom/scom-token-modal/index.css.ts"], function (require, exports, components_3, scom_token_list_2, utils_2, index_css_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_3.Styles.Theme.ThemeVars;
@@ -299,25 +299,6 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
                     return 1;
                 }
                 return 0;
-            };
-            this.getTokenObject = async (address, showBalance) => {
-                const ERC20Contract = new eth_wallet_3.Contracts.ERC20(eth_wallet_3.Wallet.getClientInstance(), address);
-                const symbol = await ERC20Contract.symbol();
-                const name = await ERC20Contract.name();
-                const decimals = (await ERC20Contract.decimals()).toFixed();
-                let balance;
-                if (showBalance && (0, scom_token_list_2.isWalletConnected)()) {
-                    balance = (await ERC20Contract.balanceOf(eth_wallet_3.Wallet.getClientInstance().account.address))
-                        .shiftedBy(-decimals)
-                        .toFixed();
-                }
-                return {
-                    address: address.toLowerCase(),
-                    decimals: +decimals,
-                    name,
-                    symbol,
-                    balance,
-                };
             };
             this.$eventBus = components_3.application.EventBus;
             this.registerEvent();
@@ -424,15 +405,15 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             this.onRefresh();
         }
         registerEvent() {
-            const clientWallet = eth_wallet_3.Wallet.getClientInstance();
-            this.walletEvents.push(clientWallet.registerWalletEvent(this, eth_wallet_3.Constants.ClientWalletEvent.AccountsChanged, async (payload) => {
-                this.onUpdateData();
-            }));
-            this.clientEvents.push(this.$eventBus.register(this, "chainChanged" /* EventId.chainChanged */, async (chainId) => {
-                this.onUpdateData();
-            }));
-            this.clientEvents.push(this.$eventBus.register(this, "Paid" /* EventId.Paid */, () => this.onUpdateData(true)));
-            this.clientEvents.push(this.$eventBus.register(this, "EmitNewToken" /* EventId.EmitNewToken */, this.updateDataByNewToken));
+            // const clientWallet = Wallet.getClientInstance();
+            // this.walletEvents.push(clientWallet.registerWalletEvent(this, Constants.ClientWalletEvent.AccountsChanged, async (payload: Record<string, any>) => {
+            //   this.onUpdateData()
+            // }));
+            // this.clientEvents.push(this.$eventBus.register(this, EventId.chainChanged, async (chainId: number) => {
+            //   this.onUpdateData();
+            // }));
+            // this.clientEvents.push(this.$eventBus.register(this, EventId.Paid, () => this.onUpdateData(true)))
+            // this.clientEvents.push(this.$eventBus.register(this, EventId.EmitNewToken, this.updateDataByNewToken))
         }
         onHide() {
             const rpcWallet = (0, utils_2.getRpcWallet)();
@@ -450,7 +431,6 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
         }
         set tokenDataListProp(value) {
             this._tokenDataListProp = value;
-            // this.renderTokenList();
         }
         get tokenListByChainId() {
             var _a, _b;
@@ -477,9 +457,10 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             if (this.tokenDataListProp && this.tokenDataListProp.length) {
                 tokenList = this.tokenDataListProp;
             }
-            if (!this.tokenBalancesMap || !Object.keys(this.tokenBalancesMap).length) {
-                this.tokenBalancesMap = scom_token_list_2.tokenStore.tokenBalances || {};
-            }
+            this.tokenBalancesMap = scom_token_list_2.tokenStore.tokenBalances || {};
+            // if (!this.tokenBalancesMap || !Object.keys(this.tokenBalancesMap).length) {
+            //   this.tokenBalancesMap = tokenStore.tokenBalances || {};
+            // }
             return tokenList.map((token) => {
                 var _a;
                 const tokenObject = Object.assign({}, token);
@@ -599,7 +580,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             this.gridTokenList.clearInnerHTML();
             this.gridTokenList.append(this.$render("i-label", { class: 'text-center', caption: 'No tokens found', margin: { top: '1rem', bottom: '1rem' } }));
         }
-        async renderTokenList() {
+        renderTokenList() {
             if (!this.gridTokenList)
                 return;
             this.renderCommonItems();
@@ -608,18 +589,6 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             if (this.tokenDataListFiltered.length) {
                 const tokenItems = this.tokenDataListFiltered.map((token) => this.renderToken(token));
                 this.gridTokenList.append(...tokenItems);
-            }
-            else {
-                try {
-                    const tokenObj = await this.getTokenObject(this.filterValue, true);
-                    if (!tokenObj)
-                        throw new Error('Token is invalid');
-                    this.gridTokenList.clearInnerHTML();
-                    this.gridTokenList.appendChild(this.renderToken(Object.assign(Object.assign({}, tokenObj), { chainId: this.chainId, isNew: true })));
-                }
-                catch (err) {
-                    this.clearTokenList();
-                }
             }
         }
         addToMetamask(event, token) {

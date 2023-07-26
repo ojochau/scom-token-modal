@@ -162,7 +162,6 @@ declare module "@scom/scom-token-modal" {
         private onSearch;
         private renderCommonItems;
         private renderToken;
-        private getTokenObject;
         private clearTokenList;
         private renderTokenList;
         private addToMetamask;

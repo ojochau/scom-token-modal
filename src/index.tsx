@@ -209,15 +209,15 @@ export default class ScomTokenModal extends Module {
   }
 
   private registerEvent() {
-    const clientWallet = Wallet.getClientInstance();
-    this.walletEvents.push(clientWallet.registerWalletEvent(this, Constants.ClientWalletEvent.AccountsChanged, async (payload: Record<string, any>) => {
-      this.onUpdateData()
-    }));
-    this.clientEvents.push(this.$eventBus.register(this, EventId.chainChanged, async (chainId: number) => {
-      this.onUpdateData();
-    }));
-    this.clientEvents.push(this.$eventBus.register(this, EventId.Paid, () => this.onUpdateData(true)))
-    this.clientEvents.push(this.$eventBus.register(this, EventId.EmitNewToken, this.updateDataByNewToken))
+    // const clientWallet = Wallet.getClientInstance();
+    // this.walletEvents.push(clientWallet.registerWalletEvent(this, Constants.ClientWalletEvent.AccountsChanged, async (payload: Record<string, any>) => {
+    //   this.onUpdateData()
+    // }));
+    // this.clientEvents.push(this.$eventBus.register(this, EventId.chainChanged, async (chainId: number) => {
+    //   this.onUpdateData();
+    // }));
+    // this.clientEvents.push(this.$eventBus.register(this, EventId.Paid, () => this.onUpdateData(true)))
+    // this.clientEvents.push(this.$eventBus.register(this, EventId.EmitNewToken, this.updateDataByNewToken))
   }
 
   onHide() {
@@ -238,7 +238,6 @@ export default class ScomTokenModal extends Module {
 
   set tokenDataListProp(value: Array<ITokenObject>) {
     this._tokenDataListProp = value;
-    // this.renderTokenList();
   }
 
   private get tokenListByChainId() {
@@ -263,9 +262,10 @@ export default class ScomTokenModal extends Module {
     if (this.tokenDataListProp && this.tokenDataListProp.length) {
       tokenList = this.tokenDataListProp;
     }
-    if (!this.tokenBalancesMap || !Object.keys(this.tokenBalancesMap).length) {
-      this.tokenBalancesMap = tokenStore.tokenBalances || {};
-    }
+    this.tokenBalancesMap = tokenStore.tokenBalances || {};
+    // if (!this.tokenBalancesMap || !Object.keys(this.tokenBalancesMap).length) {
+    //   this.tokenBalancesMap = tokenStore.tokenBalances || {};
+    // }
     return tokenList.map((token: ITokenObject) => {
       const tokenObject = { ...token };
       const nativeToken = ChainNativeTokenByChainId[this.chainId];
@@ -475,33 +475,6 @@ export default class ScomTokenModal extends Module {
     return tokenElm;
   }
 
-  private getTokenObject = async (address: string, showBalance?: boolean) => {
-    const ERC20Contract = new Contracts.ERC20(
-      Wallet.getClientInstance() as any,
-      address
-    )
-    const symbol = await ERC20Contract.symbol()
-    const name = await ERC20Contract.name()
-    const decimals = (await ERC20Contract.decimals()).toFixed()
-    let balance: any
-    if (showBalance && isWalletConnected()) {
-      balance = (
-        await ERC20Contract.balanceOf(
-          Wallet.getClientInstance().account.address
-        )
-      )
-        .shiftedBy(-decimals)
-        .toFixed()
-    }
-    return {
-      address: address.toLowerCase(),
-      decimals: +decimals,
-      name,
-      symbol,
-      balance,
-    }
-  }
-
   private clearTokenList() {
     this.gridTokenList.clearInnerHTML()
     this.gridTokenList.append(
@@ -513,7 +486,7 @@ export default class ScomTokenModal extends Module {
     )
   }
 
-  private async renderTokenList() {
+  private renderTokenList() {
     if (!this.gridTokenList) return
     this.renderCommonItems()
     this.gridTokenList.clearInnerHTML()
@@ -523,18 +496,7 @@ export default class ScomTokenModal extends Module {
         this.renderToken(token)
       )
       this.gridTokenList.append(...tokenItems)
-    } else {
-      try {
-        const tokenObj = await this.getTokenObject(this.filterValue, true)
-        if (!tokenObj) throw new Error('Token is invalid')
-        this.gridTokenList.clearInnerHTML()
-        this.gridTokenList.appendChild(
-          this.renderToken({ ...tokenObj, chainId: this.chainId,isNew: true })
-        )
-      } catch (err) {
-        this.clearTokenList()
-      }
-    }
+    } 
   }
 
   private addToMetamask(event: Event, token: ITokenObject) {
