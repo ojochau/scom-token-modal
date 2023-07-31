@@ -1,0 +1,11 @@
+{
+    "name": "@scom/scom-token-modal",
+    "type": "widget",
+    "version": "0.1.2",
+    "dependencies": [
+        "@ijstech/components",
+        "@ijstech/eth-contract",
+        "@scom/scom-token-list",
+        "@ijstech/eth-wallet"
+    ]
+}
