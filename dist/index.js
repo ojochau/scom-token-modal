@@ -183,7 +183,7 @@ define("@scom/scom-token-modal/importToken.tsx", ["require", "exports", "@ijstec
 define("@scom/scom-token-modal/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.tokenStyle = void 0;
+    exports.tokenListStyle = exports.tokenStyle = void 0;
     const Theme = components_2.Styles.Theme.ThemeVars;
     exports.tokenStyle = components_2.Styles.style({
         $nest: {
@@ -197,6 +197,23 @@ define("@scom/scom-token-modal/index.css.ts", ["require", "exports", "@ijstech/c
                         fontWeight: 600
                     }
                 }
+            }
+        }
+    });
+    exports.tokenListStyle = components_2.Styles.style({
+        maxHeight: '50vh',
+        overflow: 'auto',
+        $nest: {
+            '&::-webkit-scrollbar-track': {
+                background: 'transparent',
+            },
+            '&::-webkit-scrollbar': {
+                width: '5px',
+                height: '5px'
+            },
+            '&::-webkit-scrollbar-thumb': {
+                background: Theme.colors.primary.main,
+                borderRadius: '5px'
             }
         }
     });
@@ -724,7 +741,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
                                 this.$render("i-label", { caption: 'Balance', margin: { right: '1rem' }, font: { color: Theme.colors.primary.main } }),
                                 this.$render("i-icon", { id: 'iconSortUp', class: 'icon-sort-up', name: 'sort-up' }),
                                 this.$render("i-icon", { id: 'iconSortDown', class: 'icon-sort-down', name: 'sort-down' }))),
-                        this.$render("i-grid-layout", { id: 'gridTokenList', width: '100%', columnsPerRow: 1, templateRows: ['max-content'], gap: { row: '0.5rem' } }))),
+                        this.$render("i-grid-layout", { id: 'gridTokenList', width: '100%', columnsPerRow: 1, templateRows: ['max-content'], gap: { row: '0.5rem' }, class: index_css_1.tokenListStyle }))),
                 this.$render("import-token", { id: 'mdImportToken' })));
         }
     };

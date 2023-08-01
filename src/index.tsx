@@ -33,7 +33,7 @@ import { EventId } from './interface'
 import { formatNumber, getChainId, getRpcWallet, setRpcWalletId } from './utils'
 import { ImportToken } from './importToken'
 import { Constants, Contracts, IEventBusRegistry, Wallet } from '@ijstech/eth-wallet'
-import customStyle, { tokenStyle } from './index.css'
+import customStyle, { tokenListStyle, tokenStyle } from './index.css'
 const Theme = Styles.Theme.ThemeVars
 
 interface ScomTokenModalElement extends ControlElement {
@@ -703,6 +703,7 @@ export default class ScomTokenModal extends Module {
               columnsPerRow={1}
               templateRows={['max-content']}
               gap={{ row: '0.5rem' }}
+              class={tokenListStyle}
             ></i-grid-layout>
           </i-panel>
         </i-modal>

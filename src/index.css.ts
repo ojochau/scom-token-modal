@@ -17,6 +17,24 @@ export const tokenStyle = Styles.style({
   }
 })
 
+export const tokenListStyle = Styles.style({
+  maxHeight: '50vh',
+  overflow: 'auto',
+  $nest: {
+    '&::-webkit-scrollbar-track': {
+      background: 'transparent',
+    },
+    '&::-webkit-scrollbar': {
+      width: '5px',
+      height: '5px'
+    },
+    '&::-webkit-scrollbar-thumb': {
+      background: Theme.colors.primary.main,
+      borderRadius: '5px'
+    }
+  }
+})
+
 export default Styles.style({
   $nest: {
     '.full-width': {

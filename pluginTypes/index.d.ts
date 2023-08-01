@@ -76,6 +76,7 @@ declare module "@scom/scom-token-modal/importToken.tsx" {
 /// <amd-module name="@scom/scom-token-modal/index.css.ts" />
 declare module "@scom/scom-token-modal/index.css.ts" {
     export const tokenStyle: string;
+    export const tokenListStyle: string;
     const _default: string;
     export default _default;
 }
