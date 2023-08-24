@@ -47,7 +47,9 @@ export default class Module1 extends Module {
                 <i-scom-token-modal
                     id="mbToken1"
                     isCommonShown={true}
+                    chainId={43113}
                     token={{
+                        "chainId": 43113,
                         "name": "OpenSwap",
                         "address": "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
                         "symbol": "OSWAP",
