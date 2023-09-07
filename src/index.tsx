@@ -45,6 +45,8 @@ interface ScomTokenModalElement extends ControlElement {
   isSortBalanceShown?: boolean;
   isCommonShown?: boolean;
   rpcWalletId?: string;
+  targetChainId?: number;
+  targetTokenBalancesMap?: Record<string, string>;
   onSelectToken?: (token: ITokenObject) => void
 }
 
@@ -61,11 +63,12 @@ declare global {
 @customModule
 @customElements('i-scom-token-modal')
 export default class ScomTokenModal extends Module {
-  private tokenBalancesMap: any
+  private tokenBalancesMap: Record<string, string>
   private hstackMap: Map<string, HStack> = new Map()
   private currentToken: string = ''
   private $eventBus: IEventBus
   private _targetChainId: number
+  private _targetTokenBalancesMap: Record<string, string>
   private _token: ITokenObject
   private _title: string | Control = 'Select Token'
   private _isCommonShown: boolean = false
@@ -129,6 +132,13 @@ export default class ScomTokenModal extends Module {
   set targetChainId(value: number) {
     this._targetChainId = value
     // this.onUpdateData()
+  }
+
+  get targetTokenBalancesMap() {
+    return this._targetTokenBalancesMap
+  }
+  set targetTokenBalancesMap(value: Record<string, string>) {
+    this._targetTokenBalancesMap = value
   }
 
   get chainId(): number {
@@ -263,6 +273,7 @@ export default class ScomTokenModal extends Module {
       tokenList = this.tokenDataListProp;
     }
     this.tokenBalancesMap = tokenStore.tokenBalances || {};
+    const balancesMap = this.targetTokenBalancesMap && this.targetChainId !== getChainId() ? this.targetTokenBalancesMap : this.tokenBalancesMap
     // if (!this.tokenBalancesMap || !Object.keys(this.tokenBalancesMap).length) {
     //   this.tokenBalancesMap = tokenStore.tokenBalances || {};
     // }
@@ -277,9 +288,9 @@ export default class ScomTokenModal extends Module {
           balance: 0,
         })
       }
-      else if (this.tokenBalancesMap) {
+      else if (balancesMap) {
         Object.assign(tokenObject, {
-          balance: this.tokenBalancesMap[token.address?.toLowerCase() || token.symbol] || 0,
+          balance: balancesMap[token.address?.toLowerCase() || token.symbol] || 0,
         })
       }
       return tokenObject;
@@ -572,6 +583,7 @@ export default class ScomTokenModal extends Module {
     this.onSelectToken = this.getAttribute('onSelectToken', true) || this.onSelectToken
     const titleAttr = this.getAttribute('title', true)
     if (titleAttr) this.title = titleAttr
+    this.targetTokenBalancesMap = this.getAttribute('targetTokenBalancesMap', true)
     this.tokenDataListProp = this.getAttribute('tokenDataListProp', true, [])
     const token = this.getAttribute('token', true)
     if (token) this.token = token
