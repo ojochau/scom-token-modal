@@ -340,21 +340,17 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             this.setActive(value);
             // if (this.onSelectToken) this.onSelectToken(this.token)
         }
-        get targetChainId() {
-            return this._targetChainId;
+        get tokenBalancesMapProp() {
+            return this._tokenBalancesMapProp;
         }
-        set targetChainId(value) {
-            this._targetChainId = value;
-            // this.onUpdateData()
-        }
-        get targetTokenBalancesMap() {
-            return this._targetTokenBalancesMap;
-        }
-        set targetTokenBalancesMap(value) {
-            this._targetTokenBalancesMap = value;
+        set tokenBalancesMapProp(value) {
+            this._tokenBalancesMapProp = value;
         }
         get chainId() {
-            return this.targetChainId || (0, utils_2.getChainId)();
+            return this._chainId || (0, utils_2.getChainId)();
+        }
+        set chainId(value) {
+            this._chainId = value;
         }
         get isCommonShown() {
             return this._isCommonShown;
@@ -481,7 +477,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
                 tokenList = this.tokenDataListProp;
             }
             this.tokenBalancesMap = scom_token_list_2.tokenStore.tokenBalances || {};
-            const balancesMap = this.targetTokenBalancesMap && this.targetChainId !== (0, utils_2.getChainId)() ? this.targetTokenBalancesMap : this.tokenBalancesMap;
+            const balancesMap = this.tokenBalancesMapProp && this.chainId !== (0, utils_2.getChainId)() ? this.tokenBalancesMapProp : this.tokenBalancesMap;
             // if (!this.tokenBalancesMap || !Object.keys(this.tokenBalancesMap).length) {
             //   this.tokenBalancesMap = tokenStore.tokenBalances || {};
             // }
@@ -688,14 +684,12 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             const titleAttr = this.getAttribute('title', true);
             if (titleAttr)
                 this.title = titleAttr;
-            this.targetTokenBalancesMap = this.getAttribute('targetTokenBalancesMap', true);
+            this.tokenBalancesMapProp = this.getAttribute('tokenBalancesMapProp', true);
             this.tokenDataListProp = this.getAttribute('tokenDataListProp', true, []);
             const token = this.getAttribute('token', true);
             if (token)
                 this.token = token;
-            const chainId = this.getAttribute('chainId', true);
-            if (chainId)
-                this.targetChainId = chainId;
+            this.chainId = this.getAttribute('chainId', true);
             this.isCommonShown = this.getAttribute('isCommonShown', true, false);
             this.isSortBalanceShown = this.getAttribute('isSortBalanceShown', true, true);
             this.importable = this.getAttribute('importable', true, false);
