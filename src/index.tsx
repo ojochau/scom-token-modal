@@ -32,7 +32,7 @@ import {
 import { EventId } from './interface'
 import { formatNumber, getChainId, getRpcWallet, setRpcWalletId } from './utils'
 import { ImportToken } from './importToken'
-import { Constants, Contracts, IEventBusRegistry, Wallet } from '@ijstech/eth-wallet'
+import { IEventBusRegistry } from '@ijstech/eth-wallet'
 import customStyle, { tokenListStyle, tokenStyle } from './index.css'
 const Theme = Styles.Theme.ThemeVars
 
@@ -45,8 +45,7 @@ interface ScomTokenModalElement extends ControlElement {
   isSortBalanceShown?: boolean;
   isCommonShown?: boolean;
   rpcWalletId?: string;
-  targetChainId?: number;
-  targetTokenBalancesMap?: Record<string, string>;
+  tokenBalancesMapProp?: Record<string, string>;
   onSelectToken?: (token: ITokenObject) => void
 }
 
@@ -67,8 +66,8 @@ export default class ScomTokenModal extends Module {
   private hstackMap: Map<string, HStack> = new Map()
   private currentToken: string = ''
   private $eventBus: IEventBus
-  private _targetChainId: number
-  private _targetTokenBalancesMap: Record<string, string>
+  private _chainId: number;
+  private _tokenBalancesMapProp: Record<string, string>
   private _token: ITokenObject
   private _title: string | Control = 'Select Token'
   private _isCommonShown: boolean = false
@@ -126,23 +125,18 @@ export default class ScomTokenModal extends Module {
     // if (this.onSelectToken) this.onSelectToken(this.token)
   }
 
-  get targetChainId(): number {
-    return this._targetChainId
+  get tokenBalancesMapProp() {
+    return this._tokenBalancesMapProp
   }
-  set targetChainId(value: number) {
-    this._targetChainId = value
-    // this.onUpdateData()
-  }
-
-  get targetTokenBalancesMap() {
-    return this._targetTokenBalancesMap
-  }
-  set targetTokenBalancesMap(value: Record<string, string>) {
-    this._targetTokenBalancesMap = value
+  set tokenBalancesMapProp(value: Record<string, string>) {
+    this._tokenBalancesMapProp = value
   }
 
   get chainId(): number {
-    return this.targetChainId || getChainId()
+    return this._chainId || getChainId()
+  }
+  set chainId(value: number | undefined) {
+    this._chainId = value;
   }
 
   get isCommonShown(): boolean {
@@ -273,7 +267,7 @@ export default class ScomTokenModal extends Module {
       tokenList = this.tokenDataListProp;
     }
     this.tokenBalancesMap = tokenStore.tokenBalances || {};
-    const balancesMap = this.targetTokenBalancesMap && this.targetChainId !== getChainId() ? this.targetTokenBalancesMap : this.tokenBalancesMap
+    const balancesMap = this.tokenBalancesMapProp && this.chainId !== getChainId() ? this.tokenBalancesMapProp : this.tokenBalancesMap
     // if (!this.tokenBalancesMap || !Object.keys(this.tokenBalancesMap).length) {
     //   this.tokenBalancesMap = tokenStore.tokenBalances || {};
     // }
@@ -583,12 +577,11 @@ export default class ScomTokenModal extends Module {
     this.onSelectToken = this.getAttribute('onSelectToken', true) || this.onSelectToken
     const titleAttr = this.getAttribute('title', true)
     if (titleAttr) this.title = titleAttr
-    this.targetTokenBalancesMap = this.getAttribute('targetTokenBalancesMap', true)
+    this.tokenBalancesMapProp = this.getAttribute('tokenBalancesMapProp', true)
     this.tokenDataListProp = this.getAttribute('tokenDataListProp', true, [])
     const token = this.getAttribute('token', true)
     if (token) this.token = token
-    const chainId = this.getAttribute('chainId', true)
-    if (chainId) this.targetChainId = chainId
+    this.chainId = this.getAttribute('chainId', true)
     this.isCommonShown = this.getAttribute('isCommonShown', true, false)
     this.isSortBalanceShown = this.getAttribute('isSortBalanceShown', true, true)
     this.importable = this.getAttribute('importable', true, false)
