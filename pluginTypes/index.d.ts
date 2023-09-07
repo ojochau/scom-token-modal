@@ -93,6 +93,8 @@ declare module "@scom/scom-token-modal" {
         isSortBalanceShown?: boolean;
         isCommonShown?: boolean;
         rpcWalletId?: string;
+        targetChainId?: number;
+        targetTokenBalancesMap?: Record<string, string>;
         onSelectToken?: (token: ITokenObject) => void;
     }
     global {
@@ -108,6 +110,7 @@ declare module "@scom/scom-token-modal" {
         private currentToken;
         private $eventBus;
         private _targetChainId;
+        private _targetTokenBalancesMap;
         private _token;
         private _title;
         private _isCommonShown;
@@ -138,6 +141,8 @@ declare module "@scom/scom-token-modal" {
         set token(value: ITokenObject | undefined);
         get targetChainId(): number;
         set targetChainId(value: number);
+        get targetTokenBalancesMap(): Record<string, string>;
+        set targetTokenBalancesMap(value: Record<string, string>);
         get chainId(): number;
         get isCommonShown(): boolean;
         set isCommonShown(value: boolean);

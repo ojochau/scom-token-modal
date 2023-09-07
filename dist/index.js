@@ -347,6 +347,12 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             this._targetChainId = value;
             // this.onUpdateData()
         }
+        get targetTokenBalancesMap() {
+            return this._targetTokenBalancesMap;
+        }
+        set targetTokenBalancesMap(value) {
+            this._targetTokenBalancesMap = value;
+        }
         get chainId() {
             return this.targetChainId || (0, utils_2.getChainId)();
         }
@@ -475,6 +481,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
                 tokenList = this.tokenDataListProp;
             }
             this.tokenBalancesMap = scom_token_list_2.tokenStore.tokenBalances || {};
+            const balancesMap = this.targetTokenBalancesMap && this.targetChainId !== (0, utils_2.getChainId)() ? this.targetTokenBalancesMap : this.tokenBalancesMap;
             // if (!this.tokenBalancesMap || !Object.keys(this.tokenBalancesMap).length) {
             //   this.tokenBalancesMap = tokenStore.tokenBalances || {};
             // }
@@ -490,9 +497,9 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
                         balance: 0,
                     });
                 }
-                else if (this.tokenBalancesMap) {
+                else if (balancesMap) {
                     Object.assign(tokenObject, {
-                        balance: this.tokenBalancesMap[((_a = token.address) === null || _a === void 0 ? void 0 : _a.toLowerCase()) || token.symbol] || 0,
+                        balance: balancesMap[((_a = token.address) === null || _a === void 0 ? void 0 : _a.toLowerCase()) || token.symbol] || 0,
                     });
                 }
                 return tokenObject;
@@ -681,6 +688,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             const titleAttr = this.getAttribute('title', true);
             if (titleAttr)
                 this.title = titleAttr;
+            this.targetTokenBalancesMap = this.getAttribute('targetTokenBalancesMap', true);
             this.tokenDataListProp = this.getAttribute('tokenDataListProp', true, []);
             const token = this.getAttribute('token', true);
             if (token)
