@@ -33,8 +33,8 @@ declare module "@scom/scom-token-modal/interface.ts" {
 }
 /// <amd-module name="@scom/scom-token-modal/utils.ts" />
 declare module "@scom/scom-token-modal/utils.ts" {
-    export const formatNumber: (value: any, decimals?: number) => string;
-    export const formatNumberWithSeparators: (value: number, precision?: number) => string;
+    import { BigNumber } from "@ijstech/eth-wallet";
+    export const formatNumber: (value: number | string | BigNumber, decimals?: number) => string;
     export const getNetworkInfo: (chainId: number) => any;
     export const viewOnExplorerByAddress: (chainId: number, address: string) => void;
     export const setRpcWalletId: (value: string) => void;
