@@ -17,46 +17,45 @@ define("@scom/scom-token-modal/interface.ts", ["require", "exports"], function (
         SITE_ENV["MAINNET"] = "mainnet";
     })(SITE_ENV = exports.SITE_ENV || (exports.SITE_ENV = {}));
 });
-define("@scom/scom-token-modal/utils.ts", ["require", "exports", "@ijstech/eth-wallet"], function (require, exports, eth_wallet_1) {
+define("@scom/scom-token-modal/utils.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet"], function (require, exports, components_1, eth_wallet_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getChainId = exports.getRpcWallet = exports.setRpcWalletId = exports.viewOnExplorerByAddress = exports.getNetworkInfo = exports.formatNumberWithSeparators = exports.formatNumber = void 0;
+    exports.getChainId = exports.getRpcWallet = exports.setRpcWalletId = exports.viewOnExplorerByAddress = exports.getNetworkInfo = exports.formatNumber = void 0;
     const formatNumber = (value, decimals) => {
-        let val = value;
+        // let val = value;
+        // const minValue = '0.0000001';
+        // if (typeof value === 'string') {
+        //   val = new BigNumber(value).toNumber();
+        // } else if (typeof value === 'object') {
+        //   val = value.toNumber();
+        // }
+        // if (val != 0 && new BigNumber(val).lt(minValue)) {
+        //   return `<${minValue}`;
+        // }
         const minValue = '0.0000001';
-        if (typeof value === 'string') {
-            val = new eth_wallet_1.BigNumber(value).toNumber();
-        }
-        else if (typeof value === 'object') {
-            val = value.toNumber();
-        }
-        if (val != 0 && new eth_wallet_1.BigNumber(val).lt(minValue)) {
-            return `<${minValue}`;
-        }
-        return (0, exports.formatNumberWithSeparators)(val, decimals || 4);
+        const newValue = typeof value === 'object' ? value.toString() : value;
+        return components_1.FormatUtils.formatNumber(newValue, { decimalFigures: decimals || 4, minValue });
     };
     exports.formatNumber = formatNumber;
-    const formatNumberWithSeparators = (value, precision) => {
-        if (!value)
-            value = 0;
-        if (precision) {
-            let outputStr = '';
-            if (value >= 1) {
-                outputStr = value.toLocaleString('en-US', { maximumFractionDigits: precision });
-            }
-            else {
-                outputStr = value.toLocaleString('en-US', { maximumSignificantDigits: precision });
-            }
-            if (outputStr.length > 18) {
-                outputStr = outputStr.substr(0, 18) + '...';
-            }
-            return outputStr;
-        }
-        else {
-            return value.toLocaleString('en-US');
-        }
-    };
-    exports.formatNumberWithSeparators = formatNumberWithSeparators;
+    // export const formatNumberWithSeparators = (value: number, precision?: number) => {
+    //   if (!value) value = 0;
+    //   if (precision) {
+    //     let outputStr = '';
+    //     if (value >= 1) {
+    //       outputStr = value.toLocaleString('en-US', { maximumFractionDigits: precision });
+    //     }
+    //     else {
+    //       outputStr = value.toLocaleString('en-US', { maximumSignificantDigits: precision });
+    //     }
+    //     if (outputStr.length > 18) {
+    //       outputStr = outputStr.substr(0, 18) + '...'
+    //     }
+    //     return outputStr;
+    //   }
+    //   else {
+    //     return value.toLocaleString('en-US');
+    //   }
+    // }
     const getNetworkInfo = (chainId) => {
         return eth_wallet_1.Wallet.getClientInstance().getNetworkInfo(chainId);
     };
@@ -87,19 +86,19 @@ define("@scom/scom-token-modal/utils.ts", ["require", "exports", "@ijstech/eth-w
     exports.getChainId = getChainId;
     ;
 });
-define("@scom/scom-token-modal/importToken.tsx", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-token-modal/utils.ts", "@scom/scom-token-list"], function (require, exports, components_1, eth_wallet_2, utils_1, scom_token_list_1) {
+define("@scom/scom-token-modal/importToken.tsx", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-token-modal/utils.ts", "@scom/scom-token-list"], function (require, exports, components_2, eth_wallet_2, utils_1, scom_token_list_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ImportToken = void 0;
     ;
-    let ImportToken = class ImportToken extends components_1.Module {
+    let ImportToken = class ImportToken extends components_2.Module {
         constructor(parent, options) {
             super(parent, options);
             this._state = {
                 address: '',
                 name: ''
             };
-            this.$eventBus = components_1.application.EventBus;
+            this.$eventBus = components_2.application.EventBus;
         }
         ;
         set token(value) {
@@ -173,19 +172,19 @@ define("@scom/scom-token-modal/importToken.tsx", ["require", "exports", "@ijstec
         }
     };
     __decorate([
-        (0, components_1.observable)()
+        (0, components_2.observable)()
     ], ImportToken.prototype, "_state", void 0);
     ImportToken = __decorate([
-        (0, components_1.customElements)('import-token')
+        (0, components_2.customElements)('import-token')
     ], ImportToken);
     exports.ImportToken = ImportToken;
 });
-define("@scom/scom-token-modal/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_2) {
+define("@scom/scom-token-modal/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.tokenListStyle = exports.tokenStyle = void 0;
-    const Theme = components_2.Styles.Theme.ThemeVars;
-    exports.tokenStyle = components_2.Styles.style({
+    const Theme = components_3.Styles.Theme.ThemeVars;
+    exports.tokenStyle = components_3.Styles.style({
         $nest: {
             '&:hover': {
                 background: Theme.action.hover
@@ -200,7 +199,7 @@ define("@scom/scom-token-modal/index.css.ts", ["require", "exports", "@ijstech/c
             }
         }
     });
-    exports.tokenListStyle = components_2.Styles.style({
+    exports.tokenListStyle = components_3.Styles.style({
         maxHeight: '50vh',
         overflow: 'auto',
         $nest: {
@@ -217,7 +216,7 @@ define("@scom/scom-token-modal/index.css.ts", ["require", "exports", "@ijstech/c
             }
         }
     });
-    exports.default = components_2.Styles.style({
+    exports.default = components_3.Styles.style({
         $nest: {
             '.full-width': {
                 width: '100%',
@@ -287,11 +286,11 @@ define("@scom/scom-token-modal/index.css.ts", ["require", "exports", "@ijstech/c
         }
     });
 });
-define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "@scom/scom-token-list", "@scom/scom-token-modal/utils.ts", "@scom/scom-token-modal/index.css.ts"], function (require, exports, components_3, scom_token_list_2, utils_2, index_css_1) {
+define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "@scom/scom-token-list", "@scom/scom-token-modal/utils.ts", "@scom/scom-token-modal/index.css.ts"], function (require, exports, components_4, scom_token_list_2, utils_2, index_css_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const Theme = components_3.Styles.Theme.ThemeVars;
-    let ScomTokenModal = class ScomTokenModal extends components_3.Module {
+    const Theme = components_4.Styles.Theme.ThemeVars;
+    let ScomTokenModal = class ScomTokenModal extends components_4.Module {
         constructor(parent, options) {
             super(parent, options);
             this.hstackMap = new Map();
@@ -317,7 +316,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
                 }
                 return 0;
             };
-            this.$eventBus = components_3.application.EventBus;
+            this.$eventBus = components_4.application.EventBus;
             this.registerEvent();
         }
         static async create(options, parent) {
@@ -380,7 +379,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             this._title = value;
             let labelEl;
             if (typeof value === 'string') {
-                labelEl = new components_3.Label(undefined, {
+                labelEl = new components_4.Label(undefined, {
                     caption: value,
                     font: { color: Theme.colors.primary.main, size: '1rem', bold: true },
                 });
@@ -389,7 +388,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
                 labelEl = value;
             }
             if (!this.titleStack)
-                this.titleStack = new components_3.HStack();
+                this.titleStack = new components_4.HStack();
             this.titleStack.clearInnerHTML();
             this.titleStack.appendChild(labelEl);
         }
@@ -588,7 +587,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
                                     token.address && !token.isNative ? (this.$render("i-icon", { name: 'copy', width: '14px', height: '14px', display: 'inline-flex', fill: Theme.text.primary, tooltip: {
                                             content: `${token.symbol} has been copied`,
                                             trigger: 'click',
-                                        }, onClick: () => components_3.application.copyToClipboard(token.address || '') })) : ([]),
+                                        }, onClick: () => components_4.application.copyToClipboard(token.address || '') })) : ([]),
                                     token.address && (0, scom_token_list_2.hasMetaMask)() ? (this.$render("i-image", { display: 'flex', width: 16, height: 16, url: scom_token_list_2.assets.fullPath('img/metamask.png'), tooltip: { content: 'Add to MetaMask' }, onClick: (target, event) => this.addToMetamask(event, token) })) : ([])))),
                         this.$render("i-label", { margin: { left: 'auto' }, caption: (0, utils_2.formatNumber)(token.balance, 4) })),
                     token.isNew ? (this.$render("i-hstack", { horizontalAlignment: 'center' },
@@ -748,14 +747,14 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
         }
     };
     __decorate([
-        (0, components_3.observable)()
+        (0, components_4.observable)()
     ], ScomTokenModal.prototype, "sortValue", void 0);
     __decorate([
-        (0, components_3.observable)()
+        (0, components_4.observable)()
     ], ScomTokenModal.prototype, "filterValue", void 0);
     ScomTokenModal = __decorate([
-        components_3.customModule,
-        (0, components_3.customElements)('i-scom-token-modal')
+        components_4.customModule,
+        (0, components_4.customElements)('i-scom-token-modal')
     ], ScomTokenModal);
     exports.default = ScomTokenModal;
 });
