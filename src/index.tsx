@@ -41,7 +41,6 @@ interface ScomTokenModalElement extends ControlElement {
   importable?: boolean;
   isSortBalanceShown?: boolean;
   isCommonShown?: boolean;
-  tokenBalancesMapProp?: Record<string, string>;
   onSelectToken?: (token: ITokenObject) => void
 }
 
@@ -61,7 +60,6 @@ export default class ScomTokenModal extends Module {
   private hstackMap: Map<string, HStack> = new Map()
   private currentToken: string = ''
   private _chainId: number;
-  private _tokenBalancesMapProp: Record<string, string>
   private _token: ITokenObject
   private _title: string | Control = 'Select Token'
   private _isCommonShown: boolean = false
@@ -102,13 +100,6 @@ export default class ScomTokenModal extends Module {
   set token(value: ITokenObject | undefined) {
     this._token = value
     this.setActive(value)
-  }
-
-  get tokenBalancesMapProp() {
-    return this._tokenBalancesMapProp
-  }
-  set tokenBalancesMapProp(value: Record<string, string>) {
-    this._tokenBalancesMapProp = value
   }
 
   get chainId(): number {
@@ -510,7 +501,6 @@ export default class ScomTokenModal extends Module {
     this.onSelectToken = this.getAttribute('onSelectToken', true) || this.onSelectToken
     const titleAttr = this.getAttribute('title', true)
     if (titleAttr) this.title = titleAttr
-    this.tokenBalancesMapProp = this.getAttribute('tokenBalancesMapProp', true)
     this.tokenDataListProp = this.getAttribute('tokenDataListProp', true, [])
     const token = this.getAttribute('token', true)
     if (token) this.token = token
