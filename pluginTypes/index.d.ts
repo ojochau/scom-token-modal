@@ -4,6 +4,7 @@ declare module "@scom/scom-token-modal/utils.ts" {
     export const formatNumber: (value: number | string | BigNumber, decimals?: number) => string;
     export const getNetworkInfo: (chainId: number) => any;
     export const viewOnExplorerByAddress: (chainId: number, address: string) => void;
+    export const hasMetaMask: () => boolean;
 }
 /// <amd-module name="@scom/scom-token-modal/importToken.tsx" />
 declare module "@scom/scom-token-modal/importToken.tsx" {
@@ -55,7 +56,6 @@ declare module "@scom/scom-token-modal" {
         importable?: boolean;
         isSortBalanceShown?: boolean;
         isCommonShown?: boolean;
-        tokenBalancesMapProp?: Record<string, string>;
         onSelectToken?: (token: ITokenObject) => void;
     }
     global {
@@ -69,7 +69,6 @@ declare module "@scom/scom-token-modal" {
         private hstackMap;
         private currentToken;
         private _chainId;
-        private _tokenBalancesMapProp;
         private _token;
         private _title;
         private _isCommonShown;
@@ -93,8 +92,6 @@ declare module "@scom/scom-token-modal" {
         static create(options?: ScomTokenModalElement, parent?: Container): Promise<ScomTokenModal>;
         get token(): ITokenObject | undefined;
         set token(value: ITokenObject | undefined);
-        get tokenBalancesMapProp(): Record<string, string>;
-        set tokenBalancesMapProp(value: Record<string, string>);
         get chainId(): number;
         set chainId(value: number | undefined);
         get isCommonShown(): boolean;

@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 define("@scom/scom-token-modal/utils.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet"], function (require, exports, components_1, eth_wallet_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.viewOnExplorerByAddress = exports.getNetworkInfo = exports.formatNumber = void 0;
+    exports.hasMetaMask = exports.viewOnExplorerByAddress = exports.getNetworkInfo = exports.formatNumber = void 0;
     const formatNumber = (value, decimals) => {
         const minValue = '0.0000001';
         const newValue = typeof value === 'object' ? value.toString() : value;
@@ -26,6 +26,12 @@ define("@scom/scom-token-modal/utils.ts", ["require", "exports", "@ijstech/compo
         }
     };
     exports.viewOnExplorerByAddress = viewOnExplorerByAddress;
+    const hasMetaMask = function () {
+        var _a;
+        const wallet = eth_wallet_1.Wallet.getClientInstance();
+        return ((_a = wallet === null || wallet === void 0 ? void 0 : wallet.clientSideProvider) === null || _a === void 0 ? void 0 : _a.name) === 'metamask';
+    };
+    exports.hasMetaMask = hasMetaMask;
 });
 define("@scom/scom-token-modal/importToken.tsx", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-token-modal/utils.ts"], function (require, exports, components_2, eth_wallet_2, utils_1) {
     "use strict";
@@ -225,7 +231,7 @@ define("@scom/scom-token-modal/index.css.ts", ["require", "exports", "@ijstech/c
         }
     });
 });
-define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "@scom/scom-token-list", "@scom/scom-token-modal/utils.ts", "@scom/scom-token-modal/index.css.ts"], function (require, exports, components_4, scom_token_list_1, utils_2, index_css_1) {
+define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "@scom/scom-token-list", "@scom/scom-token-modal/utils.ts", "@scom/scom-token-modal/index.css.ts", "@ijstech/eth-wallet"], function (require, exports, components_4, scom_token_list_1, utils_2, index_css_1, eth_wallet_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_4.Styles.Theme.ThemeVars;
@@ -264,12 +270,6 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
         set token(value) {
             this._token = value;
             this.setActive(value);
-        }
-        get tokenBalancesMapProp() {
-            return this._tokenBalancesMapProp;
-        }
-        set tokenBalancesMapProp(value) {
-            this._tokenBalancesMapProp = value;
         }
         get chainId() {
             return this._chainId;
@@ -318,7 +318,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             this.titleStack.appendChild(labelEl);
         }
         onRefresh() {
-            if ((0, scom_token_list_1.isWalletConnected)()) {
+            if (eth_wallet_3.Wallet.getClientInstance().isConnected) {
                 if (this.token) {
                     const _tokenList = scom_token_list_1.tokenStore.getTokenList(this.chainId);
                     const token = _tokenList.find((t) => {
@@ -373,7 +373,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
                 if ((nativeToken === null || nativeToken === void 0 ? void 0 : nativeToken.symbol) && token.symbol === nativeToken.symbol) {
                     Object.assign(tokenObject, { isNative: true });
                 }
-                if (!(0, scom_token_list_1.isWalletConnected)()) {
+                if (!eth_wallet_3.Wallet.getClientInstance().isConnected) {
                     Object.assign(tokenObject, {
                         balance: 0,
                     });
@@ -474,7 +474,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
                                             content: `${token.symbol} has been copied`,
                                             trigger: 'click',
                                         }, onClick: () => components_4.application.copyToClipboard(token.address || '') })) : ([]),
-                                    token.address && (0, scom_token_list_1.hasMetaMask)() ? (this.$render("i-image", { display: 'flex', width: 16, height: 16, url: scom_token_list_1.assets.fullPath('img/metamask.png'), tooltip: { content: 'Add to MetaMask' }, onClick: (target, event) => this.addToMetamask(event, token) })) : ([])))),
+                                    token.address && (0, utils_2.hasMetaMask)() ? (this.$render("i-image", { display: 'flex', width: 16, height: 16, url: scom_token_list_1.assets.fullPath('img/metamask.png'), tooltip: { content: 'Add to MetaMask' }, onClick: (target, event) => this.addToMetamask(event, token) })) : ([])))),
                         this.$render("i-label", { margin: { left: 'auto' }, caption: (0, utils_2.formatNumber)(token.balance, 4) })),
                     token.isNew ? (this.$render("i-hstack", { horizontalAlignment: 'center' },
                         this.$render("i-button", { caption: 'Import', class: 'btn-import', margin: { top: 10 }, height: 34, onClick: (source, event) => this.showImportTokenModal(tokenElm, event, token) }))) : ([]))));
@@ -567,7 +567,6 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             const titleAttr = this.getAttribute('title', true);
             if (titleAttr)
                 this.title = titleAttr;
-            this.tokenBalancesMapProp = this.getAttribute('tokenBalancesMapProp', true);
             this.tokenDataListProp = this.getAttribute('tokenDataListProp', true, []);
             const token = this.getAttribute('token', true);
             if (token)

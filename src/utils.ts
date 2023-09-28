@@ -18,3 +18,8 @@ export const viewOnExplorerByAddress = (chainId: number, address: string) => {
     window.open(url);
   }
 }
+
+export const hasMetaMask = function () {
+  const wallet = Wallet.getClientInstance();
+  return wallet?.clientSideProvider?.name === 'metamask';
+}

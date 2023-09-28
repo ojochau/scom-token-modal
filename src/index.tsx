@@ -19,18 +19,17 @@ import {
 import { } from '@ijstech/eth-contract'
 import {
   ChainNativeTokenByChainId,
-  hasMetaMask,
   hasUserToken,
   setUserTokens,
   tokenStore,
-  isWalletConnected,
   assets,
   DefaultERC20Tokens,
   ITokenObject
 } from '@scom/scom-token-list'
-import { formatNumber } from './utils'
+import { formatNumber, hasMetaMask } from './utils'
 import { ImportToken } from './importToken'
 import customStyle, { tokenListStyle, tokenStyle } from './index.css'
+import { Wallet } from '@ijstech/eth-wallet'
 const Theme = Styles.Theme.ThemeVars
 
 interface ScomTokenModalElement extends ControlElement {
@@ -152,7 +151,7 @@ export default class ScomTokenModal extends Module {
   }
 
   onRefresh() {
-    if (isWalletConnected()) {
+    if (Wallet.getClientInstance().isConnected) {
       if (this.token) {
         const _tokenList = tokenStore.getTokenList(this.chainId)
         const token = _tokenList.find(
@@ -204,7 +203,7 @@ export default class ScomTokenModal extends Module {
       if (nativeToken?.symbol && token.symbol === nativeToken.symbol) {
         Object.assign(tokenObject, { isNative: true })
       }
-      if (!isWalletConnected()){
+      if (!Wallet.getClientInstance().isConnected){
         Object.assign(tokenObject, {
           balance: 0,
         })
