@@ -1,45 +1,9 @@
-/// <reference path="@ijstech/eth-wallet/index.d.ts" />
-/// <amd-module name="@scom/scom-token-modal/interface.ts" />
-declare module "@scom/scom-token-modal/interface.ts" {
-    import { ITokenObject } from "@scom/scom-token-list";
-    export interface INetwork {
-        chainId: number;
-        name: string;
-        img?: string;
-        rpc?: string;
-        symbol?: string;
-        env?: string;
-        explorerName?: string;
-        explorerTxUrl?: string;
-        explorerAddressUrl?: string;
-        isDisabled?: boolean;
-    }
-    export const enum EventId {
-        ConnectWallet = "connectWallet",
-        IsWalletConnected = "isWalletConnected",
-        chainChanged = "chainChanged",
-        IsWalletDisconnected = "IsWalletDisconnected",
-        EmitNewToken = "EmitNewToken",
-        Paid = "Paid"
-    }
-    export type TokenMapType = {
-        [token: string]: ITokenObject;
-    };
-    export enum SITE_ENV {
-        DEV = "dev",
-        TESTNET = "testnet",
-        MAINNET = "mainnet"
-    }
-}
 /// <amd-module name="@scom/scom-token-modal/utils.ts" />
 declare module "@scom/scom-token-modal/utils.ts" {
     import { BigNumber } from "@ijstech/eth-wallet";
     export const formatNumber: (value: number | string | BigNumber, decimals?: number) => string;
     export const getNetworkInfo: (chainId: number) => any;
     export const viewOnExplorerByAddress: (chainId: number, address: string) => void;
-    export const setRpcWalletId: (value: string) => void;
-    export const getRpcWallet: () => import("@ijstech/eth-wallet").IRpcWallet;
-    export function getChainId(): number;
 }
 /// <amd-module name="@scom/scom-token-modal/importToken.tsx" />
 declare module "@scom/scom-token-modal/importToken.tsx" {
@@ -57,7 +21,6 @@ declare module "@scom/scom-token-modal/importToken.tsx" {
         private importBtn;
         private tokenAgreeCheckBox;
         private _token;
-        private $eventBus;
         onUpdate: any;
         private _state;
         constructor(parent?: Container, options?: any);
@@ -92,7 +55,6 @@ declare module "@scom/scom-token-modal" {
         importable?: boolean;
         isSortBalanceShown?: boolean;
         isCommonShown?: boolean;
-        rpcWalletId?: string;
         tokenBalancesMapProp?: Record<string, string>;
         onSelectToken?: (token: ITokenObject) => void;
     }
@@ -104,10 +66,8 @@ declare module "@scom/scom-token-modal" {
         }
     }
     export default class ScomTokenModal extends Module {
-        private tokenBalancesMap;
         private hstackMap;
         private currentToken;
-        private $eventBus;
         private _chainId;
         private _tokenBalancesMapProp;
         private _token;
@@ -116,9 +76,6 @@ declare module "@scom/scom-token-modal" {
         private _isSortBalanceShown;
         private _importable;
         private _tokenDataListProp;
-        private _rpcWalletId;
-        private walletEvents;
-        private clientEvents;
         private mdTokenSelection;
         private gridTokenList;
         private gridCommonToken;
@@ -134,8 +91,6 @@ declare module "@scom/scom-token-modal" {
         onSelectToken: (token: ITokenObject) => void;
         constructor(parent?: Container, options?: any);
         static create(options?: ScomTokenModalElement, parent?: Container): Promise<ScomTokenModal>;
-        get rpcWalletId(): string;
-        set rpcWalletId(value: string);
         get token(): ITokenObject | undefined;
         set token(value: ITokenObject | undefined);
         get tokenBalancesMapProp(): Record<string, string>;
@@ -151,10 +106,6 @@ declare module "@scom/scom-token-modal" {
         get title(): any;
         set title(value: string | Control);
         onRefresh(): void;
-        private updateDataByNewToken;
-        private onUpdateData;
-        private registerEvent;
-        onHide(): void;
         get tokenDataListProp(): Array<ITokenObject>;
         set tokenDataListProp(value: Array<ITokenObject>);
         private get tokenListByChainId();

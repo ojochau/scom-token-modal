@@ -7,15 +7,13 @@ import {
   observable,
   Button,
   Container,
-  IEventBus,
   application,
   Checkbox
 } from '@ijstech/components'; 
 import { Wallet } from '@ijstech/eth-wallet';
 import { ITokenObject } from '@scom/scom-token-list';
-import { getChainId, getRpcWallet, viewOnExplorerByAddress } from './utils';
+import { viewOnExplorerByAddress } from './utils';
 import { tokenStore, addUserTokens } from '@scom/scom-token-list';
-import { EventId } from './interface';
 
 declare global {
 	namespace JSX {
@@ -31,7 +29,6 @@ export class ImportToken extends Module {
   private importBtn: Button;
   private tokenAgreeCheckBox: Checkbox;
   private _token: ITokenObject;
-  private $eventBus: IEventBus;
   public onUpdate: any;
 
   @observable()
@@ -42,7 +39,6 @@ export class ImportToken extends Module {
 
   constructor(parent?: Container, options?: any) {
     super(parent, options);
-    this.$eventBus = application.EventBus;
   };
 
   set token(value: ITokenObject) {
@@ -70,12 +66,11 @@ export class ImportToken extends Module {
   async onImportToken(source: Control, event: Event) {
     event.stopPropagation();
     const tokenObj = this.token;
-    const chainId = getChainId();
-    addUserTokens(chainId, tokenObj);
-    const rpcWallet = getRpcWallet();
-    tokenStore.updateTokenMapData(chainId);
-    await tokenStore.updateAllTokenBalances(rpcWallet);
-    this.$eventBus.dispatch(EventId.EmitNewToken, tokenObj);
+    // const chainId = getChainId();
+    // addUserTokens(chainId, tokenObj);
+    // const rpcWallet = getRpcWallet();
+    // tokenStore.updateTokenMapData(chainId);
+    // await tokenStore.updateAllTokenBalances(rpcWallet);
     if (typeof this.onUpdate === 'function') {
       this.onUpdate(tokenObj);
     }
