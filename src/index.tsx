@@ -262,11 +262,11 @@ export default class ScomTokenModal extends Module {
   private sortBalance() {
     this.sortValue = !this.sortValue
     if (this.sortValue) {
-      this.iconSortUp.classList.add('icon-sorted')
-      this.iconSortDown.classList.remove('icon-sorted')
+      this.iconSortUp.fill = Theme.colors.primary.main;
+      this.iconSortDown.fill = Theme.text.primary;
     } else {
-      this.iconSortUp.classList.remove('icon-sorted')
-      this.iconSortDown.classList.add('icon-sorted')
+      this.iconSortUp.fill = Theme.text.primary;
+      this.iconSortDown.fill = Theme.colors.primary.main;
     }
     this.renderTokenList()
   }
@@ -318,7 +318,8 @@ export default class ScomTokenModal extends Module {
     const tokenElm = (
       <i-hstack
         width='100%'
-        class={`pointer ${tokenStyle} ${isActive ? ' is-selected' : ''}`}
+        class={`pointer ${tokenStyle}`}
+        background={{color: isActive ? Theme.action.active : ''}}
         verticalAlignment='center'
         padding={
           {
@@ -342,7 +343,7 @@ export default class ScomTokenModal extends Module {
                 fallbackUrl={assets.fallbackUrl}
               />
               <i-panel>
-                <i-label class="token-symbol" caption={token.symbol} font={{ bold: true }} />
+                <i-label caption={token.symbol} font={{ weight: 600 }} />
                 <i-hstack
                   verticalAlignment='center'
                   gap='0.5rem'
@@ -388,9 +389,12 @@ export default class ScomTokenModal extends Module {
             <i-hstack horizontalAlignment='center'>
               <i-button
                 caption='Import'
-                class='btn-import'
                 margin={{ top: 10 }}
                 height={34}
+                border={{radius: 5}}
+                background={{color: Theme.background.gradient}}
+                font={{color: Theme.colors.primary.contrastText, size: '1rem'}}
+                padding={{top: '0.25rem', bottom: '0.25rem', left: '1.25rem', right: '1.25rem'}}
                 onClick={(source: Control, event: Event) =>
                   this.showImportTokenModal(tokenElm, event, token)
                 }
@@ -453,8 +457,8 @@ export default class ScomTokenModal extends Module {
     if (this.inputSearch) this.inputSearch.value = ''
     this.filterValue = ''
     this.sortValue = undefined
-    this.iconSortUp.classList.remove('icon-sorted')
-    this.iconSortDown.classList.remove('icon-sorted')
+    this.iconSortUp.fill = Theme.text.primary;
+    this.iconSortDown.fill = Theme.text.primary;
     if (!this.gridTokenList?.innerHTML) this.onRefresh()
     if (this.mdTokenSelection) this.mdTokenSelection.visible = true
     this.gridTokenList.scrollTop = 0
@@ -466,10 +470,10 @@ export default class ScomTokenModal extends Module {
 
   private setActive(token: ITokenObject | undefined) {
     if (this.currentToken && this.hstackMap.has(this.currentToken)) {
-      this.hstackMap.get(this.currentToken).classList.remove('is-selected')
+      this.hstackMap.get(this.currentToken).background.color = ''
     }
     if (token && this.hstackMap.has(token.address)) {
-      this.hstackMap.get(token.address).classList.add('is-selected')
+      this.hstackMap.get(token.address).background.color = Theme.action.active;
     }
     this.currentToken = token?.address || ''
   }
@@ -589,7 +593,7 @@ export default class ScomTokenModal extends Module {
                   style: 'solid',
                   color: Theme.divider,
                 }}
-                class='search-input'
+                padding={{top: '1rem', right: '1rem', bottom: '1rem', left: '2.25rem'}}
                 onKeyUp={this.onSearch.bind(this)}
               ></i-input>
             </i-panel>
@@ -606,7 +610,7 @@ export default class ScomTokenModal extends Module {
               id='pnlSortBalance'
               horizontalAlignment='space-between'
               verticalAlignment='center'
-              class='sort-panel'
+              margin={{top: '0.5rem', bottom: '0.5rem'}}
               visible={this.isSortBalanceShown}
             >
               <i-label
@@ -619,8 +623,28 @@ export default class ScomTokenModal extends Module {
                   margin={{ right: '1rem' }}
                   font={{ color: Theme.colors.primary.main }}
                 />
-                <i-icon id='iconSortUp' class='icon-sort-up' name='sort-up' />
-                <i-icon id='iconSortDown' class='icon-sort-down' name='sort-down' />
+                <i-icon
+                  id='iconSortUp'
+                  name='sort-up'
+                  width={10}
+                  height={14}
+                  display='flex'
+                  fill={Theme.text.primary}
+                  position='absolute'
+                  right="0px" top='2px'
+                  class="pointer"
+                ></i-icon>
+                <i-icon
+                  id='iconSortDown'
+                  name='sort-down'
+                  width={10}
+                  height={14}
+                  display='flex'
+                  fill={Theme.text.primary}
+                  position='absolute'
+                  right="0px" bottom='2px'
+                  class="pointer"
+                ></i-icon>
               </i-panel>
             </i-hstack>
             <i-grid-layout
@@ -629,6 +653,7 @@ export default class ScomTokenModal extends Module {
               columnsPerRow={1}
               templateRows={['max-content']}
               gap={{ row: '0.5rem' }}
+              maxHeight={'50vh'} overflow={{y: 'auto'}}
               class={tokenListStyle}
             ></i-grid-layout>
           </i-panel>

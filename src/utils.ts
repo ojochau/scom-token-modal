@@ -3,7 +3,7 @@ import { BigNumber, Wallet } from "@ijstech/eth-wallet";
 
 export const formatNumber = (value: number | string | BigNumber, decimals?: number) => {
   const minValue = '0.0000001';
-  const newValue = typeof value === 'object' ? value.toString() : value;
+  const newValue = typeof value === 'object' ? value.toFixed() : value;
   return FormatUtils.formatNumber(newValue, { decimalFigures: decimals || 4, minValue });
 };
 

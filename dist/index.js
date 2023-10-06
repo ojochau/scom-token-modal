@@ -10,7 +10,7 @@ define("@scom/scom-token-modal/utils.ts", ["require", "exports", "@ijstech/compo
     exports.hasMetaMask = exports.viewOnExplorerByAddress = exports.getNetworkInfo = exports.formatNumber = void 0;
     const formatNumber = (value, decimals) => {
         const minValue = '0.0000001';
-        const newValue = typeof value === 'object' ? value.toString() : value;
+        const newValue = typeof value === 'object' ? value.toFixed() : value;
         return components_1.FormatUtils.formatNumber(newValue, { decimalFigures: decimals || 4, minValue });
     };
     exports.formatNumber = formatNumber;
@@ -37,6 +37,7 @@ define("@scom/scom-token-modal/importToken.tsx", ["require", "exports", "@ijstec
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ImportToken = void 0;
+    const Theme = components_2.Styles.Theme.ThemeVars;
     ;
     let ImportToken = class ImportToken extends components_2.Module {
         constructor(parent, options) {
@@ -113,7 +114,7 @@ define("@scom/scom-token-modal/importToken.tsx", ["require", "exports", "@ijstec
                         this.$render("i-label", { width: 300, font: { bold: true }, caption: "If you purchased this token, you may not be to able sell it back" })),
                     this.$render("i-hstack", { horizontalAlignment: "center", class: "text-center" },
                         this.$render("i-checkbox", { id: "tokenAgreeCheckBox", width: "200", margin: { top: 30 }, height: 30, class: "token-agree-input", background: { color: 'transparent' }, caption: "I understand", onChanged: this.onHandleCheck.bind(this) }))),
-                this.$render("i-button", { id: "importBtn", class: "btn-import", width: "100%", caption: "Import", height: 40, enabled: false, onClick: this.onImportToken.bind(this) })));
+                this.$render("i-button", { id: "importBtn", width: "100%", caption: "Import", height: 40, border: { radius: 5 }, background: { color: Theme.background.gradient }, font: { color: Theme.colors.primary.contrastText, size: '1rem' }, padding: { top: '0.25rem', bottom: '0.25rem', left: '1.25rem', right: '1.25rem' }, enabled: false, onClick: this.onImportToken.bind(this) })));
         }
     };
     __decorate([
@@ -133,20 +134,10 @@ define("@scom/scom-token-modal/index.css.ts", ["require", "exports", "@ijstech/c
         $nest: {
             '&:hover': {
                 background: Theme.action.hover
-            },
-            '&.is-selected': {
-                background: Theme.action.active,
-                $nest: {
-                    '.token-symbol': {
-                        fontWeight: 600
-                    }
-                }
             }
         }
     });
     exports.tokenListStyle = components_3.Styles.style({
-        maxHeight: '50vh',
-        overflow: 'auto',
         $nest: {
             '&::-webkit-scrollbar-track': {
                 background: 'transparent',
@@ -163,52 +154,6 @@ define("@scom/scom-token-modal/index.css.ts", ["require", "exports", "@ijstech/c
     });
     exports.default = components_3.Styles.style({
         $nest: {
-            '.full-width': {
-                width: '100%',
-                $nest: {
-                    '.modal': {
-                        padding: 0
-                    }
-                }
-            },
-            '.box-shadow > div': {
-                boxShadow: '0 3px 6px -4px rgba(0,0,0,.12), 0 6px 16px 0 rgba(0,0,0,.08), 0 9px 28px 8px rgba(0,0,0,.05)'
-            },
-            '.is-ellipsis': {
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis'
-            },
-            '.sort-panel': {
-                marginBlock: '0.5rem',
-                $nest: {
-                    'i-icon': {
-                        width: '10px',
-                        height: '14px',
-                        display: 'flex',
-                        fill: Theme.text.primary,
-                        position: 'absolute',
-                        right: '0',
-                        cursor: 'pointer'
-                    },
-                    '.icon-sort-up': {
-                        top: '2px',
-                    },
-                    '.icon-sort-down': {
-                        bottom: '2px',
-                    },
-                    '.icon-sorted': {
-                        fill: Theme.colors.primary.main,
-                    }
-                }
-            },
-            '.search-input': {
-                $nest: {
-                    'input': {
-                        padding: '1rem 1.5rem 1rem 2.25rem'
-                    }
-                }
-            },
             '.centered': {
                 transform: 'translateY(-50%)'
             },
@@ -217,16 +162,6 @@ define("@scom/scom-token-modal/index.css.ts", ["require", "exports", "@ijstech/c
             },
             '.common-token:hover': {
                 border: `1px solid ${Theme.colors.primary.main}`
-            },
-            '.btn-import': {
-                background: 'transparent linear-gradient(255deg,#e75b66,#b52082) 0% 0% no-repeat padding-box',
-                borderRadius: '5px',
-                color: '#fff',
-                fontSize: '1rem',
-                padding: '0.25rem 1.25rem'
-            },
-            '#btnToken': {
-                justifyContent: 'space-between'
             }
         }
     });
@@ -418,12 +353,12 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
         sortBalance() {
             this.sortValue = !this.sortValue;
             if (this.sortValue) {
-                this.iconSortUp.classList.add('icon-sorted');
-                this.iconSortDown.classList.remove('icon-sorted');
+                this.iconSortUp.fill = Theme.colors.primary.main;
+                this.iconSortDown.fill = Theme.text.primary;
             }
             else {
-                this.iconSortUp.classList.remove('icon-sorted');
-                this.iconSortDown.classList.add('icon-sorted');
+                this.iconSortUp.fill = Theme.text.primary;
+                this.iconSortDown.fill = Theme.colors.primary.main;
             }
             this.renderTokenList();
         }
@@ -456,7 +391,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             const isActive = this.token && token.address === this.token.address;
             if (isActive)
                 this.currentToken = this.token.address;
-            const tokenElm = (this.$render("i-hstack", { width: '100%', class: `pointer ${index_css_1.tokenStyle} ${isActive ? ' is-selected' : ''}`, verticalAlignment: 'center', padding: {
+            const tokenElm = (this.$render("i-hstack", { width: '100%', class: `pointer ${index_css_1.tokenStyle}`, background: { color: isActive ? Theme.action.active : '' }, verticalAlignment: 'center', padding: {
                     top: '0.5rem',
                     bottom: '0.5rem',
                     left: '0.75rem',
@@ -467,7 +402,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
                         this.$render("i-hstack", { gap: '0.5rem' },
                             this.$render("i-image", { width: 24, height: 24, url: tokenIconPath, fallbackUrl: scom_token_list_1.assets.fallbackUrl }),
                             this.$render("i-panel", null,
-                                this.$render("i-label", { class: "token-symbol", caption: token.symbol, font: { bold: true } }),
+                                this.$render("i-label", { caption: token.symbol, font: { weight: 600 } }),
                                 this.$render("i-hstack", { verticalAlignment: 'center', gap: '0.5rem' },
                                     this.$render("i-label", { caption: token.name }),
                                     token.address && !token.isNative ? (this.$render("i-icon", { name: 'copy', width: '14px', height: '14px', display: 'inline-flex', fill: Theme.text.primary, tooltip: {
@@ -477,7 +412,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
                                     token.address && (0, utils_2.hasMetaMask)() ? (this.$render("i-image", { display: 'flex', width: 16, height: 16, url: scom_token_list_1.assets.fullPath('img/metamask.png'), tooltip: { content: 'Add to MetaMask' }, onClick: (target, event) => this.addToMetamask(event, token) })) : ([])))),
                         this.$render("i-label", { margin: { left: 'auto' }, caption: (0, utils_2.formatNumber)(token.balance, 4) })),
                     token.isNew ? (this.$render("i-hstack", { horizontalAlignment: 'center' },
-                        this.$render("i-button", { caption: 'Import', class: 'btn-import', margin: { top: 10 }, height: 34, onClick: (source, event) => this.showImportTokenModal(tokenElm, event, token) }))) : ([]))));
+                        this.$render("i-button", { caption: 'Import', margin: { top: 10 }, height: 34, border: { radius: 5 }, background: { color: Theme.background.gradient }, font: { color: Theme.colors.primary.contrastText, size: '1rem' }, padding: { top: '0.25rem', bottom: '0.25rem', left: '1.25rem', right: '1.25rem' }, onClick: (source, event) => this.showImportTokenModal(tokenElm, event, token) }))) : ([]))));
             this.hstackMap.set(token.address, tokenElm);
             return tokenElm;
         }
@@ -521,8 +456,8 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
                 this.inputSearch.value = '';
             this.filterValue = '';
             this.sortValue = undefined;
-            this.iconSortUp.classList.remove('icon-sorted');
-            this.iconSortDown.classList.remove('icon-sorted');
+            this.iconSortUp.fill = Theme.text.primary;
+            this.iconSortDown.fill = Theme.text.primary;
             if (!((_a = this.gridTokenList) === null || _a === void 0 ? void 0 : _a.innerHTML))
                 this.onRefresh();
             if (this.mdTokenSelection)
@@ -534,10 +469,10 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
         }
         setActive(token) {
             if (this.currentToken && this.hstackMap.has(this.currentToken)) {
-                this.hstackMap.get(this.currentToken).classList.remove('is-selected');
+                this.hstackMap.get(this.currentToken).background.color = '';
             }
             if (token && this.hstackMap.has(token.address)) {
-                this.hstackMap.get(token.address).classList.add('is-selected');
+                this.hstackMap.get(token.address).background.color = Theme.action.active;
             }
             this.currentToken = (token === null || token === void 0 ? void 0 : token.address) || '';
         }
@@ -614,17 +549,17 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
                                     width: '1px',
                                     style: 'solid',
                                     color: Theme.divider,
-                                }, class: 'search-input', onKeyUp: this.onSearch.bind(this) })),
+                                }, padding: { top: '1rem', right: '1rem', bottom: '1rem', left: '2.25rem' }, onKeyUp: this.onSearch.bind(this) })),
                         this.$render("i-panel", { id: 'pnlCommonToken', margin: { top: '0.5rem', bottom: '0.5rem' } },
                             this.$render("i-label", { caption: 'Common Token' }),
                             this.$render("i-grid-layout", { id: 'gridCommonToken', columnsPerRow: 4, gap: { row: '0.5rem', column: '1rem' }, verticalAlignment: 'center' })),
-                        this.$render("i-hstack", { id: 'pnlSortBalance', horizontalAlignment: 'space-between', verticalAlignment: 'center', class: 'sort-panel', visible: this.isSortBalanceShown },
+                        this.$render("i-hstack", { id: 'pnlSortBalance', horizontalAlignment: 'space-between', verticalAlignment: 'center', margin: { top: '0.5rem', bottom: '0.5rem' }, visible: this.isSortBalanceShown },
                             this.$render("i-label", { caption: 'Token', font: { color: Theme.colors.primary.main } }),
                             this.$render("i-panel", { margin: { left: 'auto' }, onClick: () => this.sortBalance() },
                                 this.$render("i-label", { caption: 'Balance', margin: { right: '1rem' }, font: { color: Theme.colors.primary.main } }),
-                                this.$render("i-icon", { id: 'iconSortUp', class: 'icon-sort-up', name: 'sort-up' }),
-                                this.$render("i-icon", { id: 'iconSortDown', class: 'icon-sort-down', name: 'sort-down' }))),
-                        this.$render("i-grid-layout", { id: 'gridTokenList', width: '100%', columnsPerRow: 1, templateRows: ['max-content'], gap: { row: '0.5rem' }, class: index_css_1.tokenListStyle }))),
+                                this.$render("i-icon", { id: 'iconSortUp', name: 'sort-up', width: 10, height: 14, display: 'flex', fill: Theme.text.primary, position: 'absolute', right: "0px", top: '2px', class: "pointer" }),
+                                this.$render("i-icon", { id: 'iconSortDown', name: 'sort-down', width: 10, height: 14, display: 'flex', fill: Theme.text.primary, position: 'absolute', right: "0px", bottom: '2px', class: "pointer" }))),
+                        this.$render("i-grid-layout", { id: 'gridTokenList', width: '100%', columnsPerRow: 1, templateRows: ['max-content'], gap: { row: '0.5rem' }, maxHeight: '50vh', overflow: { y: 'auto' }, class: index_css_1.tokenListStyle }))),
                 this.$render("import-token", { id: 'mdImportToken' })));
         }
     };
