@@ -7,13 +7,14 @@ import {
   observable,
   Button,
   Container,
-  application,
-  Checkbox
+  Checkbox,
+  Styles
 } from '@ijstech/components'; 
 import { Wallet } from '@ijstech/eth-wallet';
 import { ITokenObject } from '@scom/scom-token-list';
 import { viewOnExplorerByAddress } from './utils';
-import { tokenStore, addUserTokens } from '@scom/scom-token-list';
+
+const Theme = Styles.Theme.ThemeVars;
 
 declare global {
 	namespace JSX {
@@ -142,10 +143,13 @@ export class ImportToken extends Module {
         </i-panel>
         <i-button
           id="importBtn"
-          class="btn-import"
           width="100%"
           caption="Import"
           height={40}
+          border={{radius: 5}}
+          background={{color: Theme.background.gradient}}
+          font={{color: Theme.colors.primary.contrastText, size: '1rem'}}
+          padding={{top: '0.25rem', bottom: '0.25rem', left: '1.25rem', right: '1.25rem'}}
           enabled={false}
           onClick={this.onImportToken.bind(this)}
         />
