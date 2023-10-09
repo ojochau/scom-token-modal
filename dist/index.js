@@ -416,10 +416,16 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             this.hstackMap.set(token.address, tokenElm);
             return tokenElm;
         }
-        clearTokenList() {
-            this.gridTokenList.clearInnerHTML();
-            this.gridTokenList.append(this.$render("i-label", { class: 'text-center', caption: 'No tokens found', margin: { top: '1rem', bottom: '1rem' } }));
-        }
+        // private clearTokenList() {
+        //   this.gridTokenList.clearInnerHTML()
+        //   this.gridTokenList.append(
+        //     <i-label
+        //       class='text-center'
+        //       caption='No tokens found'
+        //       margin={{ top: '1rem', bottom: '1rem' }}
+        //     />
+        //   )
+        // }
         renderTokenList() {
             if (!this.gridTokenList)
                 return;
@@ -449,20 +455,24 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             });
         }
         showModal() {
-            var _a;
+            var _a, _b, _c, _d;
             if (!this.enabled)
                 return;
-            if (this.inputSearch)
-                this.inputSearch.value = '';
-            this.filterValue = '';
-            this.sortValue = undefined;
-            this.iconSortUp.fill = Theme.text.primary;
-            this.iconSortDown.fill = Theme.text.primary;
             if (!((_a = this.gridTokenList) === null || _a === void 0 ? void 0 : _a.innerHTML))
                 this.onRefresh();
-            if (this.mdTokenSelection)
+            if (this.mdTokenSelection) {
+                this.mdTokenSelection.maxWidth = (_b = this.maxWidth) !== null && _b !== void 0 ? _b : '440px';
+                if (this.minWidth)
+                    this.mdTokenSelection.minWidth = this.minWidth;
+                if ((_c = this.background) === null || _c === void 0 ? void 0 : _c.color) {
+                    this.mdTokenSelection.background.color = this.background.color;
+                }
                 this.mdTokenSelection.visible = true;
-            this.gridTokenList.scrollTop = 0;
+            }
+            if (this.gridTokenList) {
+                this.gridTokenList.maxHeight = (_d = this.maxHeight) !== null && _d !== void 0 ? _d : '50vh';
+                this.gridTokenList.scrollTop = 0;
+            }
         }
         closeModal() {
             this.mdTokenSelection.visible = false;
@@ -522,6 +532,12 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
         }
         onCloseModal() {
             this.filterValue = '';
+            if (this.inputSearch)
+                this.inputSearch.value = '';
+            this.filterValue = '';
+            this.sortValue = undefined;
+            this.iconSortUp.fill = Theme.text.primary;
+            this.iconSortDown.fill = Theme.text.primary;
         }
         onOpenModal() {
             if (this._title)
@@ -549,7 +565,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
                                     width: '1px',
                                     style: 'solid',
                                     color: Theme.divider,
-                                }, padding: { top: '1rem', right: '1rem', bottom: '1rem', left: '2.25rem' }, onKeyUp: this.onSearch.bind(this) })),
+                                }, background: { color: Theme.input.background }, padding: { top: '1rem', right: '1rem', bottom: '1rem', left: '2.25rem' }, onKeyUp: this.onSearch.bind(this) })),
                         this.$render("i-panel", { id: 'pnlCommonToken', margin: { top: '0.5rem', bottom: '0.5rem' } },
                             this.$render("i-label", { caption: 'Common Token' }),
                             this.$render("i-grid-layout", { id: 'gridCommonToken', columnsPerRow: 4, gap: { row: '0.5rem', column: '1rem' }, verticalAlignment: 'center' })),

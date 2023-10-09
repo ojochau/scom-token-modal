@@ -19,8 +19,6 @@ import {
 import { } from '@ijstech/eth-contract'
 import {
   ChainNativeTokenByChainId,
-  hasUserToken,
-  setUserTokens,
   tokenStore,
   assets,
   DefaultERC20Tokens,
@@ -410,16 +408,16 @@ export default class ScomTokenModal extends Module {
     return tokenElm;
   }
 
-  private clearTokenList() {
-    this.gridTokenList.clearInnerHTML()
-    this.gridTokenList.append(
-      <i-label
-        class='text-center'
-        caption='No tokens found'
-        margin={{ top: '1rem', bottom: '1rem' }}
-      />
-    )
-  }
+  // private clearTokenList() {
+  //   this.gridTokenList.clearInnerHTML()
+  //   this.gridTokenList.append(
+  //     <i-label
+  //       class='text-center'
+  //       caption='No tokens found'
+  //       margin={{ top: '1rem', bottom: '1rem' }}
+  //     />
+  //   )
+  // }
 
   private renderTokenList() {
     if (!this.gridTokenList) return
@@ -454,14 +452,19 @@ export default class ScomTokenModal extends Module {
 
   showModal() {
     if (!this.enabled) return
-    if (this.inputSearch) this.inputSearch.value = ''
-    this.filterValue = ''
-    this.sortValue = undefined
-    this.iconSortUp.fill = Theme.text.primary;
-    this.iconSortDown.fill = Theme.text.primary;
     if (!this.gridTokenList?.innerHTML) this.onRefresh()
-    if (this.mdTokenSelection) this.mdTokenSelection.visible = true
-    this.gridTokenList.scrollTop = 0
+    if (this.mdTokenSelection) {
+      this.mdTokenSelection.maxWidth = this.maxWidth ?? '440px';
+      if (this.minWidth) this.mdTokenSelection.minWidth = this.minWidth;
+      if (this.background?.color) {
+        this.mdTokenSelection.background.color = this.background.color;
+      }
+      this.mdTokenSelection.visible = true
+    }
+    if (this.gridTokenList) {
+      this.gridTokenList.maxHeight = this.maxHeight ?? '50vh';
+      this.gridTokenList.scrollTop = 0
+    }
   }
 
   closeModal() {
@@ -526,6 +529,11 @@ export default class ScomTokenModal extends Module {
 
   onCloseModal() {
     this.filterValue = ''
+    if (this.inputSearch) this.inputSearch.value = ''
+    this.filterValue = ''
+    this.sortValue = undefined
+    this.iconSortUp.fill = Theme.text.primary;
+    this.iconSortDown.fill = Theme.text.primary;
   }
 
   onOpenModal() {
@@ -593,6 +601,7 @@ export default class ScomTokenModal extends Module {
                   style: 'solid',
                   color: Theme.divider,
                 }}
+                background={{color: Theme.input.background}}
                 padding={{top: '1rem', right: '1rem', bottom: '1rem', left: '2.25rem'}}
                 onKeyUp={this.onSearch.bind(this)}
               ></i-input>
