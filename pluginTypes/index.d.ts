@@ -114,7 +114,6 @@ declare module "@scom/scom-token-modal" {
         private onSearch;
         private renderCommonItems;
         private renderToken;
-        private clearTokenList;
         private renderTokenList;
         private addToMetamask;
         showModal(): void;
