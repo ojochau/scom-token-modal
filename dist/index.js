@@ -368,7 +368,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             if (this.isCommonShown && this.commonTokenDataList) {
                 this.pnlCommonToken.visible = true;
                 this.commonTokenDataList.forEach((token) => {
-                    const tokenIconPath = scom_token_list_1.assets.tokenPath(token, this.chainId);
+                    const tokenIconPath = token.logoURI || scom_token_list_1.assets.tokenPath(token, this.chainId);
                     this.gridCommonToken.appendChild(this.$render("i-hstack", { background: { color: Theme.background.default }, onClick: () => this.onSelect(token), tooltip: { content: token.name }, verticalAlignment: 'center', padding: { top: '0.35rem', bottom: '0.35rem', left: '0.5rem', right: '0.5rem' }, border: { radius: '1rem', width: '1px', style: 'solid', color: 'transparent' }, gap: "0.5rem", class: 'common-token pointer' },
                         this.$render("i-image", { width: 24, height: 24, url: tokenIconPath, fallbackUrl: scom_token_list_1.assets.fallbackUrl }),
                         this.$render("i-label", { caption: token.symbol })));
