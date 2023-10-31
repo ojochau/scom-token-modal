@@ -282,7 +282,7 @@ export default class ScomTokenModal extends Module {
     if (this.isCommonShown && this.commonTokenDataList) {
       this.pnlCommonToken.visible = true
       this.commonTokenDataList.forEach((token: ITokenObject) => {
-        const tokenIconPath = assets.tokenPath(token, this.chainId)
+        const tokenIconPath = token.logoURI || assets.tokenPath(token, this.chainId)
         this.gridCommonToken.appendChild(
           <i-hstack
             background={{ color: Theme.background.default }}
