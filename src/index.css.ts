@@ -4,7 +4,7 @@ const Theme = Styles.Theme.ThemeVars;
 export const tokenStyle = Styles.style({
   $nest: {
     '&:hover': {
-      background: Theme.action.hover
+      background: Theme.action.hoverBackground
     }
   }
 })

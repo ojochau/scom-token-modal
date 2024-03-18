@@ -132,7 +132,7 @@ define("@scom/scom-token-modal/index.css.ts", ["require", "exports", "@ijstech/c
     exports.tokenStyle = components_3.Styles.style({
         $nest: {
             '&:hover': {
-                background: Theme.action.hover
+                background: Theme.action.hoverBackground
             }
         }
     });
