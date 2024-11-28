@@ -13,6 +13,7 @@ import {
 import { Wallet } from '@ijstech/eth-wallet';
 import { ITokenObject } from '@scom/scom-token-list';
 import { viewOnExplorerByAddress } from './utils';
+import translations from './translations.json';
 
 const Theme = Styles.Theme.ThemeVars;
 
@@ -88,6 +89,7 @@ export class ImportToken extends Module {
   }
 
   async init() {
+    this.i18n.init({...translations});
     super.init();
     this.importModal.onClose = () => {
       this.tokenAgreeCheckBox.checked = false;
@@ -97,7 +99,7 @@ export class ImportToken extends Module {
   
   render() {
 		return (
-      <i-modal id="importModal" class="bg-modal" title="Select Token" closeIcon={{ name: 'times' }}>
+      <i-modal id="importModal" class="bg-modal" title="$select_token" closeIcon={{ name: 'times' }}>
         <i-panel class="pnl-token-import">
           <i-panel>
             <i-icon name="question" class="cicrle" fill="#e83e8c" width={15} height={15} margin={{ right: 3 }}></i-icon>
@@ -112,7 +114,7 @@ export class ImportToken extends Module {
           </i-hstack>
           <i-panel class="btn-source-panel">
             <i-icon name="exclamation-triangle" margin={{ right: 3 }} fill="#fff" width={15} height={15} />
-            <i-label caption="Unknow Source"/>
+            <i-label caption="Unknown Source"/>
           </i-panel>
         </i-panel>
         <i-panel class="pnl-token-import">
@@ -120,13 +122,13 @@ export class ImportToken extends Module {
             <i-icon name="exclamation-triangle" margin={{ right: 3 }} fill="#e83e8c" width={30} height={30} />
           </i-hstack>
           <i-hstack  horizontalAlignment="center" class="text-center" margin={{ bottom: 5 }}> 
-            <i-label font={{bold:true}} caption="Trade at your own risk!"/> 
+            <i-label font={{bold:true}} caption="$trade_at_your_own_risk"/> 
           </i-hstack>
           <i-hstack  horizontalAlignment="center" class="text-center" margin={{ bottom: 5 }}> 
-            <i-label caption="Anyone can create a token, including creating fake versions of existing token that claims tp represent projects"/> 
+            <i-label caption="$anyone_can_create_a_token_including_creating_fake_versions_of_existing_token_that_claims_tp_represent_projects"/>
           </i-hstack>
           <i-hstack  horizontalAlignment="center" class="text-center" margin={{ bottom: 5 }}> 
-            <i-label width={300} font={{bold:true}} caption="If you purchased this token, you may not be to able sell it back"/> 
+            <i-label width={300} font={{bold:true}} caption="$if_you_purchased_this_token_you_may_not_be_to_able_sell_it_back"/>
           </i-hstack>
           <i-hstack  horizontalAlignment="center" class="text-center">
             <i-checkbox
@@ -136,7 +138,7 @@ export class ImportToken extends Module {
               height={30}
               class="token-agree-input"
               background={{ color: 'transparent' }}
-              caption="I understand"
+              caption="$i_understand"
               onChanged={this.onHandleCheck.bind(this)}
             />
           </i-hstack>
@@ -144,7 +146,7 @@ export class ImportToken extends Module {
         <i-button
           id="importBtn"
           width="100%"
-          caption="Import"
+          caption="$import"
           height={40}
           border={{radius: 5}}
           background={{color: Theme.background.gradient}}

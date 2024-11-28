@@ -28,6 +28,7 @@ import { formatNumber, hasMetaMask } from './utils'
 import { ImportToken } from './importToken'
 import customStyle, { tokenListStyle, tokenStyle } from './index.css'
 import { Wallet } from '@ijstech/eth-wallet'
+import translations from './translations.json'
 const Theme = Styles.Theme.ThemeVars
 
 interface ScomTokenModalElement extends ControlElement {
@@ -58,7 +59,7 @@ export default class ScomTokenModal extends Module {
   private currentToken: string = ''
   private _chainId: number;
   private _token: ITokenObject
-  private _title: string | Control = 'Select Token'
+  private _title: string | Control = '$select_token'
   private _isCommonShown: boolean = false
   private _isSortBalanceShown: boolean = true
   private _importable: boolean = false
@@ -291,7 +292,9 @@ export default class ScomTokenModal extends Module {
             verticalAlignment='center'
             padding={{ top: '0.35rem', bottom: '0.35rem', left: '0.5rem', right: '0.5rem' }}
             border={{ radius: '1rem', width: '1px', style: 'solid', color: 'transparent' }}
-            gap="0.5rem" class='common-token pointer'
+            cursor='pointer'
+            gap="0.5rem"
+            class='common-token'
           >
             <i-image
               width={24}
@@ -355,7 +358,7 @@ export default class ScomTokenModal extends Module {
                       display='inline-flex'
                       fill={Theme.text.primary}
                       tooltip={{
-                        content: `${token.symbol} has been copied`,
+                        content: this.i18n.get('$has_been_copied', { token: token.symbol }),
                         trigger: 'click',
                       }}
                       onClick={() => application.copyToClipboard(token.address || '')}
@@ -369,7 +372,7 @@ export default class ScomTokenModal extends Module {
                       width={16}
                       height={16}
                       url={assets.fullPath('img/metamask.png')}
-                      tooltip={{ content: 'Add to MetaMask' }}
+                      tooltip={{ content: '$add_to_metamask' }}
                       onClick={(target: Control, event: Event) => this.addToMetamask(event, token)}
                     ></i-image>
                   ) : (
@@ -386,7 +389,7 @@ export default class ScomTokenModal extends Module {
           {token.isNew ? (
             <i-hstack horizontalAlignment='center'>
               <i-button
-                caption='Import'
+                caption='$import'
                 margin={{ top: 10 }}
                 height={34}
                 border={{radius: 5}}
@@ -502,6 +505,7 @@ export default class ScomTokenModal extends Module {
   }
 
   async init() {
+    this.i18n.init({...translations})
     this.classList.add(customStyle)
     super.init()
     this.onSelectToken = this.getAttribute('onSelectToken', true) || this.onSelectToken
@@ -562,7 +566,7 @@ export default class ScomTokenModal extends Module {
             >
               <i-hstack id='titleStack' gap='4px'>
                 <i-label
-                  caption='Select Token'
+                  caption='$select_token'
                   font={{
                     color: Theme.colors.primary.main,
                     size: '1rem',
@@ -592,7 +596,7 @@ export default class ScomTokenModal extends Module {
               />
               <i-input
                 id='inputSearch'
-                placeholder='Search name or paste address'
+                placeholder='$search_name_or_paste_address'
                 width='100%'
                 height='auto'
                 border={{
@@ -607,7 +611,7 @@ export default class ScomTokenModal extends Module {
               ></i-input>
             </i-panel>
             <i-panel id='pnlCommonToken' margin={{ top: '0.5rem', bottom: '0.5rem' }}>
-              <i-label caption='Common Token' />
+              <i-label caption='$common_token' />
               <i-grid-layout
                 id='gridCommonToken'
                 columnsPerRow={4}
@@ -623,12 +627,12 @@ export default class ScomTokenModal extends Module {
               visible={this.isSortBalanceShown}
             >
               <i-label
-                caption='Token'
+                caption='$token'
                 font={{ color: Theme.colors.primary.main }}
               />
               <i-panel margin={{ left: 'auto' }} onClick={() => this.sortBalance()}>
                 <i-label
-                  caption='Balance'
+                  caption='$balance'
                   margin={{ right: '1rem' }}
                   font={{ color: Theme.colors.primary.main }}
                 />
