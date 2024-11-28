@@ -6,6 +6,45 @@ declare module "@scom/scom-token-modal/utils.ts" {
     export const viewOnExplorerByAddress: (chainId: number, address: string) => void;
     export const hasMetaMask: () => boolean;
 }
+/// <amd-module name="@scom/scom-token-modal/translations.json.ts" />
+declare module "@scom/scom-token-modal/translations.json.ts" {
+    const _default: {
+        en: {
+            select_token: string;
+            trade_at_your_own_risk: string;
+            anyone_can_create_a_token_including_creating_fake_versions_of_existing_token_that_claims_tp_represent_projects: string;
+            if_you_purchased_this_token_you_may_not_be_to_able_sell_it_back: string;
+            i_understand: string;
+            import: string;
+            unknown_source: string;
+            no_token_found: string;
+            token: string;
+            balance: string;
+            has_been_copied: string;
+            add_to_metamask: string;
+            common_token: string;
+            search_name_or_paste_address: string;
+        };
+        zh: {};
+        vi: {
+            select_token: string;
+            trade_at_your_own_risk: string;
+            anyone_can_create_a_token_including_creating_fake_versions_of_existing_token_that_claims_tp_represent_projects: string;
+            if_you_purchased_this_token_you_may_not_be_to_able_sell_it_back: string;
+            i_understand: string;
+            import: string;
+            unknown_source: string;
+            no_token_found: string;
+            token: string;
+            balance: string;
+            has_been_copied: string;
+            add_to_metamask: string;
+            common_token: string;
+            search_name_or_paste_address: string;
+        };
+    };
+    export default _default;
+}
 /// <amd-module name="@scom/scom-token-modal/importToken.tsx" />
 declare module "@scom/scom-token-modal/importToken.tsx" {
     import { Control, ControlElement, Module, Container } from '@ijstech/components';
@@ -41,8 +80,8 @@ declare module "@scom/scom-token-modal/importToken.tsx" {
 declare module "@scom/scom-token-modal/index.css.ts" {
     export const tokenStyle: string;
     export const tokenListStyle: string;
-    const _default: string;
-    export default _default;
+    const _default_1: string;
+    export default _default_1;
 }
 /// <amd-module name="@scom/scom-token-modal" />
 declare module "@scom/scom-token-modal" {
