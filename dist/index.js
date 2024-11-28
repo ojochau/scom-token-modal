@@ -27,9 +27,8 @@ define("@scom/scom-token-modal/utils.ts", ["require", "exports", "@ijstech/compo
     };
     exports.viewOnExplorerByAddress = viewOnExplorerByAddress;
     const hasMetaMask = function () {
-        var _a;
         const wallet = eth_wallet_1.Wallet.getClientInstance();
-        return ((_a = wallet === null || wallet === void 0 ? void 0 : wallet.clientSideProvider) === null || _a === void 0 ? void 0 : _a.name) === 'metamask';
+        return wallet?.clientSideProvider?.name === 'metamask';
     };
     exports.hasMetaMask = hasMetaMask;
 });
@@ -39,37 +38,52 @@ define("@scom/scom-token-modal/translations.json.ts", ["require", "exports"], fu
     ///<amd-module name='@scom/scom-token-modal/translations.json.ts'/> 
     exports.default = {
         "en": {
-            "select_token": "Select Token",
-            "trade_at_your_own_risk": "Trade at your own risk!",
-            "anyone_can_create_a_token_including_creating_fake_versions_of_existing_token_that_claims_tp_represent_projects": "Anyone can create a token, including creating fake versions of existing token that claims tp represent projects",
-            "if_you_purchased_this_token_you_may_not_be_to_able_sell_it_back": "If you purchased this token, you may not be to able sell it back",
-            "i_understand": "I understand",
-            "import": "Import",
-            "unknown_source": "Unknown Source",
-            "no_token_found": "No Token Found",
-            "token": "Token",
-            "balance": "Balance",
-            "has_been_copied": "{{token}} has been copied",
             "add_to_metamask": "Add to MetaMask",
+            "anyone_can_create_a_token_including_creating_fake_versions_of_existing_token_that_claims_tp_represent_projects": "Anyone can create a token, including creating fake versions of existing token that claims tp represent projects",
+            "balance": "Balance",
             "common_token": "Common Token",
-            "search_name_or_paste_address": "Search name or paste address"
-        },
-        "zh": {},
-        "vi": {
-            "select_token": "Chọn Token",
-            "trade_at_your_own_risk": "Giao dịch rủi ro của bạn!",
-            "anyone_can_create_a_token_including_creating_fake_versions_of_existing_token_that_claims_tp_represent_projects": "Bất kỳ ai cũng có thể tạo token, bao gồm việc tạo các phiên bản giả của token hiện có và tuyên bố đại diện cho các dự án",
-            "if_you_purchased_this_token_you_may_not_be_to_able_sell_it_back": "Nếu bạn đã mua token này, có thể bạn sẽ không thể bán lại nó",
-            "i_understand": "Tôi hiểu",
-            "import": "Nhập",
-            "unknown_source": "Nguồn không xác định",
-            "no_token_found": "Không tìm thấy Token",
+            "has_been_copied": "{{token}} has been copied",
+            "i_understand": "I understand",
+            "if_you_purchased_this_token_you_may_not_be_to_able_sell_it_back": "If you purchased this token, you may not be to able sell it back",
+            "import": "Import",
+            "no_token_found": "No Token Found",
+            "search_name_or_paste_address": "Search name or paste address",
+            "select_token": "Select Token",
             "token": "Token",
-            "balance": "Số dư",
-            "has_been_copied": "{{token}} đã được sao chép",
+            "trade_at_your_own_risk": "Trade at your own risk!",
+            "unknown_source": "Unknown Source"
+        },
+        "zh-hant": {
+            "add_to_metamask": "添加到 MetaMask",
+            "anyone_can_create_a_token_including_creating_fake_versions_of_existing_token_that_claims_tp_represent_projects": "任何人都可以創建代幣，包括創建現有代幣的假版本，聲稱代表項目",
+            "balance": "餘額",
+            "common_token": "常見代幣",
+            "has_been_copied": "{{token}} 已被複製",
+            "i_understand": "我明白",
+            "if_you_purchased_this_token_you_may_not_be_to_able_sell_it_back": "如果您購買了此代幣，您可能無法將其賣回",
+            "import": "導入",
+            "no_token_found": "未找到代幣",
+            "search_name_or_paste_address": "搜索名稱或粘貼地址",
+            "select_token": "選擇代幣",
+            "token": "代幣",
+            "trade_at_your_own_risk": "自行承擔交易風險！",
+            "unknown_source": "未知來源"
+        },
+        "vi": {
             "add_to_metamask": "Thêm vào MetaMask",
+            "anyone_can_create_a_token_including_creating_fake_versions_of_existing_token_that_claims_tp_represent_projects": "Bất kỳ ai cũng có thể tạo token, bao gồm việc tạo các phiên bản giả của token hiện có và tuyên bố đại diện cho các dự án",
+            "balance": "Số dư",
             "common_token": "Token phổ biến",
-            "search_name_or_paste_address": "Tìm kiếm tên hoặc địa chỉ"
+            "has_been_copied": "{{token}} đã được sao chép",
+            "i_understand": "Tôi hiểu",
+            "if_you_purchased_this_token_you_may_not_be_to_able_sell_it_back": "Nếu bạn đã mua token này, có thể bạn sẽ không thể bán lại nó",
+            "import": "Nhập",
+            "no_token_found": "Không tìm thấy Token",
+            "search_name_or_paste_address": "Tìm kiếm tên hoặc địa chỉ",
+            "select_token": "Chọn Token",
+            "token": "Token",
+            "trade_at_your_own_risk": "Giao dịch rủi ro của bạn!",
+            "unknown_source": "Nguồn không xác định"
         }
     };
 });
@@ -126,7 +140,7 @@ define("@scom/scom-token-modal/importToken.tsx", ["require", "exports", "@ijstec
             (0, utils_1.viewOnExplorerByAddress)(chainId, this._state.address);
         }
         async init() {
-            this.i18n.init(Object.assign({}, translations_json_1.default));
+            this.i18n.init({ ...translations_json_1.default });
             super.init();
             this.importModal.onClose = () => {
                 this.tokenAgreeCheckBox.checked = false;
@@ -222,14 +236,13 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             this._importable = false;
             this._tokenDataListProp = [];
             this.sortToken = (a, b, asc) => {
-                var _a, _b, _c, _d;
                 if (a.balance != b.balance) {
                     return asc ? (a.balance - b.balance) : (b.balance - a.balance);
                 }
-                if (((_a = a.symbol) === null || _a === void 0 ? void 0 : _a.toLowerCase()) < ((_b = b.symbol) === null || _b === void 0 ? void 0 : _b.toLowerCase())) {
+                if (a.symbol?.toLowerCase() < b.symbol?.toLowerCase()) {
                     return -1;
                 }
-                if (((_c = a.symbol) === null || _c === void 0 ? void 0 : _c.toLowerCase()) > ((_d = b.symbol) === null || _d === void 0 ? void 0 : _d.toLowerCase())) {
+                if (a.symbol?.toLowerCase() > b.symbol?.toLowerCase()) {
                     return 1;
                 }
                 return 0;
@@ -297,11 +310,8 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             if (eth_wallet_3.Wallet.getClientInstance().isConnected) {
                 if (this.token) {
                     const _tokenList = scom_token_list_1.tokenStore.getTokenList(this.chainId);
-                    const token = _tokenList.find((t) => {
-                        var _a, _b;
-                        return (t.address && t.address == ((_a = this.token) === null || _a === void 0 ? void 0 : _a.address)) ||
-                            t.symbol == ((_b = this.token) === null || _b === void 0 ? void 0 : _b.symbol);
-                    });
+                    const token = _tokenList.find((t) => (t.address && t.address == this.token?.address) ||
+                        t.symbol == this.token?.symbol);
                     if (!token)
                         this.token = undefined;
                     else
@@ -317,21 +327,20 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             this._tokenDataListProp = value;
         }
         get tokenListByChainId() {
-            var _a, _b;
             let list = [];
             const propList = this.tokenDataListProp.filter(f => !f.chainId || f.chainId === this.chainId);
             const nativeToken = scom_token_list_1.ChainNativeTokenByChainId[this.chainId];
             const tokens = scom_token_list_1.DefaultERC20Tokens[this.chainId];
             for (const token of propList) {
-                const tokenAddress = (_a = token.address) === null || _a === void 0 ? void 0 : _a.toLowerCase();
-                if (!tokenAddress || tokenAddress === ((_b = nativeToken === null || nativeToken === void 0 ? void 0 : nativeToken.symbol) === null || _b === void 0 ? void 0 : _b.toLowerCase())) {
+                const tokenAddress = token.address?.toLowerCase();
+                if (!tokenAddress || tokenAddress === nativeToken?.symbol?.toLowerCase()) {
                     if (nativeToken)
-                        list.push(Object.assign(Object.assign({}, nativeToken), { chainId: this.chainId }));
+                        list.push({ ...nativeToken, chainId: this.chainId });
                 }
                 else {
-                    const tokenObj = tokens.find(v => { var _a; return ((_a = v.address) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === tokenAddress; });
+                    const tokenObj = tokens.find(v => v.address?.toLowerCase() === tokenAddress);
                     if (tokenObj)
-                        list.push(Object.assign(Object.assign({}, token), { chainId: this.chainId }));
+                        list.push({ ...token, chainId: this.chainId });
                 }
             }
             return list;
@@ -343,10 +352,9 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             }
             const tokenBalancesMap = scom_token_list_1.tokenStore.getTokenBalancesByChainId(this.chainId);
             return tokenList.map((token) => {
-                var _a;
-                const tokenObject = Object.assign({}, token);
+                const tokenObject = { ...token };
                 const nativeToken = scom_token_list_1.ChainNativeTokenByChainId[this.chainId];
-                if ((nativeToken === null || nativeToken === void 0 ? void 0 : nativeToken.symbol) && token.symbol === nativeToken.symbol) {
+                if (nativeToken?.symbol && token.symbol === nativeToken.symbol) {
                     Object.assign(tokenObject, { isNative: true });
                 }
                 if (!eth_wallet_3.Wallet.getClientInstance().isConnected) {
@@ -356,7 +364,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
                 }
                 else if (tokenBalancesMap) {
                     Object.assign(tokenObject, {
-                        balance: tokenBalancesMap[((_a = token.address) === null || _a === void 0 ? void 0 : _a.toLowerCase()) || token.symbol] || 0,
+                        balance: tokenBalancesMap[token.address?.toLowerCase() || token.symbol] || 0,
                     });
                 }
                 return tokenObject;
@@ -373,10 +381,9 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             if (tokenList.length) {
                 if (this.filterValue) {
                     tokenList = tokenList.filter((token) => {
-                        var _a;
                         return token.symbol.toUpperCase().includes(this.filterValue) ||
                             token.name.toUpperCase().includes(this.filterValue) ||
-                            ((_a = token.address) === null || _a === void 0 ? void 0 : _a.toUpperCase()) === this.filterValue;
+                            token.address?.toUpperCase() === this.filterValue;
                     });
                 }
                 if (this.sortValue !== undefined) {
@@ -496,22 +503,21 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             });
         }
         showModal() {
-            var _a, _b, _c, _d;
             if (!this.enabled)
                 return;
-            if (!((_a = this.gridTokenList) === null || _a === void 0 ? void 0 : _a.innerHTML))
+            if (!this.gridTokenList?.innerHTML)
                 this.onRefresh();
             if (this.mdTokenSelection) {
-                this.mdTokenSelection.maxWidth = (_b = this.maxWidth) !== null && _b !== void 0 ? _b : '440px';
+                this.mdTokenSelection.maxWidth = this.maxWidth ?? '440px';
                 if (this.minWidth)
                     this.mdTokenSelection.minWidth = this.minWidth;
-                if ((_c = this.background) === null || _c === void 0 ? void 0 : _c.color) {
+                if (this.background?.color) {
                     this.mdTokenSelection.background.color = this.background.color;
                 }
                 this.mdTokenSelection.visible = true;
             }
             if (this.gridTokenList) {
-                this.gridTokenList.maxHeight = (_d = this.maxHeight) !== null && _d !== void 0 ? _d : '50vh';
+                this.gridTokenList.maxHeight = this.maxHeight ?? '50vh';
                 this.gridTokenList.scrollTop = 0;
             }
         }
@@ -525,7 +531,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             if (token && this.hstackMap.has(token.address)) {
                 this.hstackMap.get(token.address).background.color = Theme.action.active;
             }
-            this.currentToken = (token === null || token === void 0 ? void 0 : token.address) || '';
+            this.currentToken = token?.address || '';
         }
         async onSelect(token, isNew = false) {
             this._token = token;
@@ -543,11 +549,11 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
             // }
             this.setActive(token);
             if (this.onSelectToken)
-                this.onSelectToken(Object.assign(Object.assign({}, token), { isNew }));
+                this.onSelectToken({ ...token, isNew });
             this.mdTokenSelection.visible = false;
         }
         async init() {
-            this.i18n.init(Object.assign({}, translations_json_2.default));
+            this.i18n.init({ ...translations_json_2.default });
             this.classList.add(index_css_1.default);
             super.init();
             this.onSelectToken = this.getAttribute('onSelectToken', true) || this.onSelectToken;
