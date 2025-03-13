@@ -488,7 +488,7 @@ define("@scom/scom-token-modal", ["require", "exports", "@ijstech/components", "
         addToMetamask(event, token) {
             event.stopPropagation();
             const tokenIconPath = scom_token_list_1.assets.tokenPath(token, this.chainId);
-            const img = `${window.location.origin}${tokenIconPath.substring(1)}`;
+            const img = `${window.location.origin}/${tokenIconPath.substring(1)}`;
             window.ethereum.request({
                 method: 'wallet_watchAsset',
                 params: {
