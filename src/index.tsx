@@ -438,7 +438,7 @@ export default class ScomTokenModal extends Module {
   private addToMetamask(event: Event, token: ITokenObject) {
     event.stopPropagation()
     const tokenIconPath = assets.tokenPath(token, this.chainId)
-    const img = `${window.location.origin}${tokenIconPath.substring(1)}`
+    const img = `${window.location.origin}/${tokenIconPath.substring(1)}`
     window.ethereum.request({
       method: 'wallet_watchAsset',
       params: {
